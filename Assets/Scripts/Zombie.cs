@@ -54,19 +54,9 @@ public class Zombie : MonoBehaviour
         float speed = 0;
         Color zColor; // Store Color From Object
         zColor = this.gameObject.GetComponent<Renderer>().material.color; // Get Color
-
-        if (zColor == Color.cyan)
-        {
-            speed = 7.5f;
-        }
-        if (zColor == Color.magenta)
-        {
-            speed = 5f;
-        }
-        if (zColor == Color.green)
-        {
-            speed = 2.5f;
-        }
+        if (zColor == Color.cyan) speed = 7.5f;
+        if (zColor == Color.magenta) speed = 5f;
+        if (zColor == Color.green) speed = 2.5f;
         return speed;
     }
 
