@@ -1,10 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+using NPC.Ally;
+using NPC.Enemy;
 
 public class Hero : MonoBehaviour
 {
-    public void Init(GameObject body, string name, int age)
+    Text messages;
+
+    public void Init(GameObject body, string name, int age, Text text)
     {
         body.tag = "Player";
         body.name = name.ToUpper() + age; // Hero Name
@@ -35,13 +39,15 @@ public class Hero : MonoBehaviour
         body.AddComponent<FPS_cam>();
         body.AddComponent<FPS_move>();
         FPS_move movement = body.GetComponent<FPS_move>();
-        movement.walk = AgeSprint(age); // Age Speed
+
+        HeroSpeed speed = new HeroSpeed(age);
+        movement.walk = speed.heroSpeed; // Age Speed
         // END SCRIPTS
 
         // GUN
         GameObject gun = GameObject.CreatePrimitive(PrimitiveType.Cube); // Create a Gun
         gun.name = "Gun";
-        gun.transform.position = new Vector3(.38f, -.4f, .4f);
+        gun.transform.position = new Vector3(.4f, -.4f, -.02f);
         gun.transform.localScale = new Vector3(.28f, .26f, 1f);
         gun.transform.SetParent(body.transform); // Rig
         gun.GetComponent<Renderer>().material.SetColor("_Color", Color.yellow);
@@ -52,17 +58,14 @@ public class Hero : MonoBehaviour
         cam.name = "Cam";
         cam.transform.SetParent(body.transform);
         // END CAM
+
+        // CANVAS
+        messages = text;
+        // END CANVAS
     }
 
-    float AgeSprint(int age) // Speed Generator
-    {
-        float speed = 0;
-        if (age >= 70) speed = .1f;
-        else if (age >= 30 && age < 70) speed = .15f;
-        else if (age >= 15 && age < 30) speed = .2f;
-        return speed;
-    }
-    
+    #region Messages
+
     void OnTriggerEnter(Collider coll) // Messages
     {
         // Zombie Taste
@@ -75,11 +78,12 @@ public class Hero : MonoBehaviour
                 int index = Random.Range(0, (int)Taste.Lenght);
                 zombie.zombieProperties.taste = (Taste)index;
                 zombie.zombieProperties.bodyPart = zombie.zombieProperties.taste.ToString();
-                print("Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart);
+
+                messages.text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
             }
             else // If Zombie bodyPart is !null Just Print
             {
-                print("Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart);
+                messages.text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
             }
         }
         // End Zombie Taste
@@ -88,8 +92,34 @@ public class Hero : MonoBehaviour
         else if (coll.CompareTag("Citizen"))
         {
             Citizen citizen = coll.GetComponent<Citizen>();
-            print(citizen.citizenProperties.info);
+            messages.text = citizen.citizenProperties.info;
         }
         // End Citizen Info
+    }
+
+    IEnumerator Cleaner()
+    {
+        yield return new WaitForSeconds(1);
+        messages.text = " ";
+        StopCoroutine("Cleaner");
+    }
+
+    void OnTriggerExit(Collider coll)
+    {
+        StartCoroutine("Cleaner");
+    }
+
+    #endregion
+}
+
+public class HeroSpeed
+{
+    public readonly float heroSpeed;
+
+    public HeroSpeed(int age) // Speed Generator
+    {
+        if (age >= 70) this.heroSpeed = .1f;
+        else if (age >= 30 && age < 70) this.heroSpeed = .15f;
+        else if (age >= 15 && age < 30) this.heroSpeed = .2f;
     }
 }
