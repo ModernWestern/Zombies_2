@@ -1,10 +1,35 @@
 ﻿
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using NPC.Ally;
+using NPC.Enemy;
 
 public class Manager : MonoBehaviour
 {
     public string namesFile; // Public Field To Type File Name
     public bool cursorLock = false;
+    List<GameObject> coz = new List<GameObject>(); // Store Game Objects
+    public Text[] text;
+
+    #region Canvas
+
+    void DisplayQuantity()
+    {
+        int zombieQ = 0;
+        int citizenQ = 0;
+
+        foreach (GameObject gameObjecs in coz)
+        {
+            if (gameObjecs.tag == "Zombie") zombieQ++;
+            else if (gameObjecs.tag == "Citizen") citizenQ++;
+        }
+
+        text[0].text = zombieQ.ToString(); // Canvas
+        text[1].text = citizenQ.ToString(); // Canvas
+    }
+
+    #endregion
 
     #region Methods
 
@@ -63,7 +88,7 @@ public class Manager : MonoBehaviour
         GameObject citizenManager = new GameObject(); // Manager
         citizenManager.name = "CitizenManager";
 
-        for(int i = 0; i < amount; i++)
+        for (int i = 0; i < amount; i++)
         {
             int CoZ = Random.Range(0, 2); // Citizen or Zombie
 
@@ -74,12 +99,14 @@ public class Manager : MonoBehaviour
                     zObject.AddComponent<Zombie>().Init(zObject, ZombieColor());
                     zObject.transform.SetParent(zombieManager.transform); // Parenting to Manager
                     zObject.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Cube Random Positipon
+                    coz.Add(zObject); // Fill List
                     break;
                 case 1:
                     GameObject cObject = GameObject.CreatePrimitive(PrimitiveType.Cube); // Create Cube
                     cObject.AddComponent<Citizen>().Init(cObject, CharacterNames(), CharacterAge()); // Citizen Info*
                     cObject.transform.SetParent(citizenManager.transform); // Parenting to Manager
                     cObject.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Cube Random Positipon
+                    coz.Add(cObject); // Fill List
                     break;
                 default:
                     print("Nothing");
@@ -94,8 +121,6 @@ public class Manager : MonoBehaviour
 
     void Awake()
     {
-        //new Names().CharacterNames();
-
         if (cursorLock == true) // Hide Cursor
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -103,14 +128,21 @@ public class Manager : MonoBehaviour
         }
 
         Scene();
+
+        // CITIZEN AND ZOMBIES
         CoZ(Random.Range(10, 21)); // Random Amount
+        // END CITIZEN AND ZOMBIES
 
         // HERO
         GameObject hero;
         hero = GameObject.CreatePrimitive(PrimitiveType.Capsule); // Create an Object
-        hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge());
+        hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge(), text[2]);
         hero.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Random Position
         // END HERO
+
+        // CANVAS
+        DisplayQuantity();
+        // END CANVAS
     }
 
     #endregion
