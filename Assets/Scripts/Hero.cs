@@ -47,7 +47,11 @@ public class Hero : MonoBehaviour
         // GUN
         GameObject gun = GameObject.CreatePrimitive(PrimitiveType.Cube); // Create a Gun
         gun.name = "Gun";
+<<<<<<< HEAD
         gun.transform.position = new Vector3(.4f, -.4f, -.02f);
+=======
+        gun.transform.position = new Vector3(.38f, -.4f, 0f);
+>>>>>>> master
         gun.transform.localScale = new Vector3(.28f, .26f, 1f);
         gun.transform.SetParent(body.transform); // Rig
         gun.GetComponent<Renderer>().material.SetColor("_Color", Color.yellow);
