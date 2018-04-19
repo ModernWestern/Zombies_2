@@ -1,5 +1,4 @@
-using UnityEngine.UI;
-using System.IO;
+//using System.IO;
 
 //public class Names
 //{
@@ -25,7 +24,7 @@ using System.IO;
 //    }
 //}
 
-public enum Behaviour { getMove, getIdle, getRotate }
+public enum Behaviour { getMove, getIdle, getRotate, getRun }
 public enum Taste { Brain, Legs, Arms, Eyes, Neck, Lenght }
 
 public struct ZombieProperties
@@ -43,4 +42,5 @@ public struct CitizenProperties
     public string name;
     public Greeting greeting;
     public string info;
+    public Behaviour behaviour;
 }

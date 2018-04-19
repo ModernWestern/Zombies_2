@@ -4,14 +4,31 @@ using System.Collections;
 using NPC.Ally;
 using NPC.Enemy;
 
+#region ReadOnly
+
+public class HeroSpeed
+{
+    public readonly float heroSpeed;
+
+    public HeroSpeed(int age) // Speed Generator
+    {
+        if (age >= 70) heroSpeed = .1f;
+        else if (age >= 30 && age < 70) heroSpeed = .15f;
+        else if (age >= 15 && age < 30) heroSpeed = .2f;
+    }
+}
+#endregion
+
 public class Hero : MonoBehaviour
 {
     Text messages;
 
+    #region Init
+
     public void Init(GameObject body, string name, int age, Text text)
     {
         body.tag = "Player";
-        body.name = name.ToUpper() + age; // Hero Name
+        body.name = name.ToUpper() + " " + age; // Hero Name
 
         // RIGIDBODY
         body.AddComponent<Rigidbody>();
@@ -63,10 +80,11 @@ public class Hero : MonoBehaviour
         messages = text;
         // END CANVAS
     }
+    #endregion
 
     #region Messages
 
-    void OnTriggerEnter(Collider coll) // Messages
+    void OnTriggerEnter(Collider coll)
     {
         // Zombie Taste
         if (coll.CompareTag("Zombie"))
@@ -97,6 +115,11 @@ public class Hero : MonoBehaviour
         // End Citizen Info
     }
 
+    void PartialTime(out float t)
+    {
+        t = Random.Range(3.0f, 3.6f); // Faux Delay
+    }
+
     IEnumerator Cleaner()
     {
         yield return new WaitForSeconds(1);
@@ -108,18 +131,5 @@ public class Hero : MonoBehaviour
     {
         StartCoroutine("Cleaner");
     }
-
     #endregion
-}
-
-public class HeroSpeed
-{
-    public readonly float heroSpeed;
-
-    public HeroSpeed(int age) // Speed Generator
-    {
-        if (age >= 70) this.heroSpeed = .1f;
-        else if (age >= 30 && age < 70) this.heroSpeed = .15f;
-        else if (age >= 15 && age < 30) this.heroSpeed = .2f;
-    }
 }
