@@ -21,11 +21,19 @@ public class Manager : MonoBehaviour
 {
     public string namesFile; // Public Field To Type File Name
     public bool cursorLock = false;
-    List<GameObject> coz = new List<GameObject>(); // Store Game Objects
-    public Text[] text;
+
+    // Scene Characters
     GameObject hero;
     GameObject zObject;
     GameObject cObject;
+    // End Scene Characters
+
+    // Canvas
+    List<GameObject> coz = new List<GameObject>(); // Store Game Objects
+    public Text[] text;
+    public Image[] images;
+    Color onlyAlpha;
+    // End Canvas
 
     // Spawn
     int RandomMin;
@@ -45,6 +53,18 @@ public class Manager : MonoBehaviour
         }
         text[0].text = zombieQ.ToString(); // Canvas
         text[1].text = citizenQ.ToString(); // Canvas
+    }
+    #endregion
+
+    #region Gizmos
+
+    void AddDrawLine()
+    {
+        foreach(GameObject go in coz)
+        {
+            if (go.tag == "Zombie") go.AddComponent<DisplayGizmos>().DisplayDrawLine("Chase", hero, go.GetComponent<Renderer>().material.color, "Long"); // Display Gizmo (Draw Line);
+            else if (go.tag == "Citizen") go.AddComponent<DisplayGizmos>().DisplayDrawLine("Look", zObject, Color.yellow, "Long"); // Display Gizmo (Draw Line);
+        }
     }
     #endregion
 
@@ -116,15 +136,14 @@ public class Manager : MonoBehaviour
                     zObject.AddComponent<Zombie>().Init(zObject, ZombieColor());
                     zObject.transform.SetParent(zombieManager.transform); // Parenting to Manager
                     zObject.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Cube Random Positipon
-                    coz.Add(zObject); // Fill List
-                    zObject.AddComponent<DisplayGizmos>().Gizmo(hero); // GIZMO
+                    coz.Add(zObject); // Fill List (Display Quantity Canvas)
                     break;
                 case 1:
                     cObject = GameObject.CreatePrimitive(PrimitiveType.Cube); // Create Cube
                     cObject.AddComponent<Citizen>().Init(cObject, CharacterNames(), CharacterAge()); // Citizen Info*
                     cObject.transform.SetParent(citizenManager.transform); // Parenting to Manager
                     cObject.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Cube Random Positipon
-                    coz.Add(cObject); // Fill List
+                    coz.Add(cObject); // Fill List (Display Quantity Canvas)
                     break;
                 default:
                     print("Nothing");
@@ -148,7 +167,7 @@ public class Manager : MonoBehaviour
 
         // HERO
         hero = GameObject.CreatePrimitive(PrimitiveType.Capsule); // Create an Object
-        hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge(), text[2]);
+        hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge(), text[2], images[0]);
         hero.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Random Position
         // END HERO
 
@@ -161,6 +180,10 @@ public class Manager : MonoBehaviour
         // CANVAS
         DisplayQuantity();
         // END CANVAS
+
+        // GIZMOS
+        AddDrawLine();
+        // END GIZMOS
     }
     #endregion
 }

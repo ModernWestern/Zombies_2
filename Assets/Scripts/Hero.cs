@@ -21,11 +21,14 @@ public class HeroSpeed
 
 public class Hero : MonoBehaviour
 {
+    // Canvas
     Text messages;
+    Image bg;
+    // End Canvas
 
     #region Init
 
-    public void Init(GameObject body, string name, int age, Text text)
+    public void Init(GameObject body, string name, int age, Text text, Image image)
     {
         body.tag = "Player";
         body.name = name.ToUpper() + " " + age; // Hero Name
@@ -78,6 +81,7 @@ public class Hero : MonoBehaviour
 
         // CANVAS
         messages = text;
+        bg = image;
         // END CANVAS
     }
     #endregion
@@ -90,18 +94,21 @@ public class Hero : MonoBehaviour
         if (coll.CompareTag("Zombie"))
         {
             Zombie zombie = coll.GetComponent<Zombie>(); // Call (Get) Zombie Class
+            bg.color = Color.black; // Text Color in Regards With Zombie Color
 
             if (zombie.zombieProperties.bodyPart == " ") // If Zombie bodyPart is "null" Allocate a Taste
             {
                 int index = Random.Range(0, (int)Taste.Lenght);
                 zombie.zombieProperties.taste = (Taste)index;
                 zombie.zombieProperties.bodyPart = zombie.zombieProperties.taste.ToString();
-
+                
                 messages.text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
+                messages.color = zombie.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
             }
             else // If Zombie bodyPart is !null Just Print
             {
                 messages.text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
+                messages.color = zombie.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
             }
         }
         // End Zombie Taste
@@ -109,21 +116,19 @@ public class Hero : MonoBehaviour
         // Citizen Info
         else if (coll.CompareTag("Citizen"))
         {
+            bg.color = Color.black;
             Citizen citizen = coll.GetComponent<Citizen>();
+            messages.color = citizen.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
             messages.text = citizen.citizenProperties.info;
         }
         // End Citizen Info
     }
 
-    void PartialTime(out float t)
-    {
-        t = Random.Range(3.0f, 3.6f); // Faux Delay
-    }
-
-    IEnumerator Cleaner()
+    IEnumerator Cleaner() // Clena Messages and Background Field
     {
         yield return new WaitForSeconds(1);
         messages.text = " ";
+        bg.color = new Color(0, 0, 0, 0);
         StopCoroutine("Cleaner");
     }
 

@@ -61,8 +61,8 @@ namespace NPC
 
             IEnumerator RefreshState() // Every 3 seconds call PickState
             {
-                yield return new WaitForSeconds(partialTime);
-                PartialTime(out partialTime);
+                yield return new WaitForSeconds(partialTime); 
+                PartialTime(out partialTime); // Make PartialTime() a New Value Each Call
                 PickState();
             }
 
@@ -143,9 +143,9 @@ namespace NPC
                 }
             }
 
-            void PartialTime(out float t)
+            void PartialTime(out float t) // Faux Delay (less robotic)
             {
-                t = Random.Range(3.0f, 3.6f); // Faux Delay
+                t = Random.Range(3.0f, 3.6f); 
             }
             #endregion
 
@@ -153,7 +153,7 @@ namespace NPC
 
             void Start()
             {
-                PartialTime(out partialTime);
+                PartialTime(out partialTime); // Start With Delay (less robotic)
                 PickState();
                 StartCoroutine("RefreshState");
             }
