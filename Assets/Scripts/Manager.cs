@@ -55,19 +55,7 @@ public class Manager : MonoBehaviour
         text[1].text = citizenQ.ToString(); // Canvas
     }
     #endregion
-
-    #region Gizmos
-
-    void AddDrawLine()
-    {
-        foreach(GameObject go in coz)
-        {
-            if (go.tag == "Zombie") go.AddComponent<DisplayGizmos>().DisplayDrawLine("Chase", hero, go.GetComponent<Renderer>().material.color, "Long"); // Display Gizmo (Draw Line);
-            else if (go.tag == "Citizen") go.AddComponent<DisplayGizmos>().DisplayDrawLine("Look", zObject, Color.yellow, "Long"); // Display Gizmo (Draw Line);
-        }
-    }
-    #endregion
-
+    
     #region Methods
 
     GameObject Scene() // Plane Generator
@@ -180,10 +168,6 @@ public class Manager : MonoBehaviour
         // CANVAS
         DisplayQuantity();
         // END CANVAS
-
-        // GIZMOS
-        AddDrawLine();
-        // END GIZMOS
     }
     #endregion
 }

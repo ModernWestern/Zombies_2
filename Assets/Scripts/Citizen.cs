@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using NPC.Enemy;
 
 namespace NPC
 {
@@ -8,10 +8,9 @@ namespace NPC
         public class Citizen : MonoBehaviour
         {
             public CitizenProperties citizenProperties;
-            float partialTime;
-            int pickBehave;
-            int whichWay;
-
+            GameObject[] goZombies;
+            GameObject atStake;
+            
             #region Init
 
             public void Init(GameObject CitizenBody, string name, int age)
@@ -52,100 +51,11 @@ namespace NPC
 
             float CitizenSpeed(int age) // Use citizen age property to set speed
             {
-                float speed = 0;
+                float speed = 0f;
                 if (age >= 70) speed = 2.5f;
                 else if (age >= 30 && age < 70) speed = 5f;
                 else if (age >= 15 && age < 30) speed = 7.5f;
                 return speed;
-            }
-
-            IEnumerator RefreshState() // Every 3 seconds call PickState
-            {
-                yield return new WaitForSeconds(partialTime); 
-                PartialTime(out partialTime); // Make PartialTime() a New Value Each Call
-                PickState();
-            }
-
-            void PickState() // Move or Idle
-            {
-                citizenProperties.behaviour = (Behaviour)(Random.Range(0, 3)); // Random State
-
-                if (citizenProperties.behaviour == Behaviour.getMove)
-                {
-                    whichWay = Random.Range(0, 2);
-                    StartCoroutine("RefreshState");
-                }
-                else if (citizenProperties.behaviour == Behaviour.getIdle)
-                {
-                    whichWay = 2; // Idle Case
-                    StartCoroutine("RefreshState");
-                }
-                else if (citizenProperties.behaviour == Behaviour.getRotate)
-                {
-                    whichWay = 3; // Rotate Case
-                    StartCoroutine("RefreshState");
-                }
-            }
-
-            void MoveIt() // Move Citizen Randomly
-            {
-                if (transform.position.x >= -45 && transform.position.x <= 45 && transform.position.z >= -45 && transform.position.z <= 45) // Boundaries
-                {
-                    switch (whichWay)
-                    {
-                        case 0:
-                            transform.Translate(Vector3.forward * (Time.deltaTime * CitizenSpeed(citizenProperties.age)), Space.Self);
-                            break;
-                        case 1:
-                            transform.Translate(Vector3.back * (Time.deltaTime * CitizenSpeed(citizenProperties.age)), Space.Self);
-                            break;
-                        case 2:
-                            transform.Translate(Vector3.zero);
-                            break;
-                        case 3:
-                            transform.Rotate(Vector3.up);
-                            break;
-                        case 4:
-                            transform.Translate(Vector3.up * (.075f * Mathf.Sin(1)));
-                            break;
-                        default:
-                            print("Nothing");
-                            break;
-                    }
-                }
-                else if (transform.position.x < -45) // If Get Stuck
-                {
-                    Vector3 bounce = transform.position;
-                    bounce.x = -35;
-                    transform.position = Vector3.Lerp(transform.position, bounce, Time.deltaTime);
-                    whichWay = 4;
-                }
-                else if (transform.position.x > 45) // If Get Stuck
-                {
-                    Vector3 bounce = transform.position;
-                    bounce.x = 35;
-                    transform.position = Vector3.Lerp(transform.position, bounce, Time.deltaTime);
-                    whichWay = 4;
-                }
-                else if (transform.position.z < -45) // If Get Stuck
-                {
-                    Vector3 bounce = transform.position;
-                    bounce.z = -35;
-                    transform.position = Vector3.Lerp(transform.position, bounce, Time.deltaTime);
-                    whichWay = 4;
-                }
-                else if (transform.position.z > 45) // If Get Stuck
-                {
-                    Vector3 bounce = transform.position;
-                    bounce.z = 35;
-                    transform.position = Vector3.Lerp(transform.position, bounce, Time.deltaTime);
-                    whichWay = 4;
-                }
-            }
-
-            void PartialTime(out float t) // Faux Delay (less robotic)
-            {
-                t = Random.Range(3.0f, 3.6f); 
             }
             #endregion
 
@@ -153,14 +63,17 @@ namespace NPC
 
             void Start()
             {
-                PartialTime(out partialTime); // Start With Delay (less robotic)
-                PickState();
-                StartCoroutine("RefreshState");
-            }
+                goZombies = FindObjectsOfType(typeof(GameObject)) as GameObject[];
 
-            void FixedUpdate()
-            {
-                MoveIt();
+                foreach (GameObject go in goZombies)
+                {
+                    Component zComp = go.GetComponent(typeof(Zombie)); // Any Object With This Component Gonna Be Chased
+                    if (zComp != null) atStake = go;
+                }
+
+                gameObject.AddComponent<CharacterBehaviour>();
+                gameObject.GetComponent<CharacterBehaviour>().Init(gameObject, CitizenSpeed(citizenProperties.age)); // Movement
+                gameObject.GetComponent<CharacterBehaviour>().DisplayDrawLine(atStake, Color.yellow, "Long"); // Gismoz
             }
             #endregion
         }

@@ -1,4 +1,4 @@
-public enum Behaviour { getMove, getIdle, getRotate, getRun }
+public enum Behaviour { getMove, getIdle, getRotate, setAttack }
 public enum Taste { Brain, Legs, Arms, Eyes, Neck, Lenght }
 
 public struct ZombieProperties

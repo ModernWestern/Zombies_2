@@ -24,7 +24,12 @@ public class Hero : MonoBehaviour
     // Canvas
     Text messages;
     Image bg;
+    Color bgCol = new Color(0, 0, 0, .5f);
     // End Canvas
+
+    // Attack
+    ZombieProperties zombieProperties;
+    // End Attack
 
     #region Init
 
@@ -94,7 +99,7 @@ public class Hero : MonoBehaviour
         if (coll.CompareTag("Zombie"))
         {
             Zombie zombie = coll.GetComponent<Zombie>(); // Call (Get) Zombie Class
-            bg.color = Color.black; // Text Color in Regards With Zombie Color
+            bg.color = bgCol; // Text Color in Regards With Zombie Color
 
             if (zombie.zombieProperties.bodyPart == " ") // If Zombie bodyPart is "null" Allocate a Taste
             {
@@ -104,11 +109,14 @@ public class Hero : MonoBehaviour
                 
                 messages.text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
                 messages.color = zombie.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
+
+                zombieProperties.behaviour = Behaviour.setAttack;
             }
             else // If Zombie bodyPart is !null Just Print
             {
                 messages.text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
                 messages.color = zombie.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
+                zombieProperties.behaviour = Behaviour.setAttack;
             }
         }
         // End Zombie Taste
@@ -116,7 +124,7 @@ public class Hero : MonoBehaviour
         // Citizen Info
         else if (coll.CompareTag("Citizen"))
         {
-            bg.color = Color.black;
+            bg.color = bgCol;
             Citizen citizen = coll.GetComponent<Citizen>();
             messages.color = citizen.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
             messages.text = citizen.citizenProperties.info;
@@ -135,6 +143,7 @@ public class Hero : MonoBehaviour
     void OnTriggerExit(Collider coll)
     {
         StartCoroutine("Cleaner");
+        zombieProperties.behaviour = Behaviour.getIdle;
     }
     #endregion
 }
