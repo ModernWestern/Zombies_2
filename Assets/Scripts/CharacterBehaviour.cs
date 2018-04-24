@@ -22,7 +22,7 @@ public class CharacterBehaviour : MonoBehaviour
     float partialTime;
     int pickBehave;
     int whichWay;
-    
+
     #region Gizmos
 
     public void DisplayDrawLine(GameObject obj, Color color, string lineLenght)
@@ -53,9 +53,18 @@ public class CharacterBehaviour : MonoBehaviour
 
     #region Character Behaviour
 
-    public void  Init(GameObject sortCharacter, float speed)
+    void SetRigidBody()
     {
-        switch(sortCharacter.tag)
+        gameObject.AddComponent<Rigidbody>();
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.interpolation = RigidbodyInterpolation.Extrapolate;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
+    }
+
+    public void Init(GameObject sortCharacter, float speed)
+    {
+        switch (sortCharacter.tag)
         {
             case "Zombie":
                 setBehaviour.behaviour = zombieProperties.behaviour;
@@ -173,6 +182,21 @@ public class CharacterBehaviour : MonoBehaviour
     }
     #endregion
 
+    #region BecomeToZombie
+
+    public virtual void Respond()
+    {
+        foreach(GameObject go in Manager.coz)
+        {
+            float dist = Vector3.Distance(go.transform.position, transform.position);
+            if (dist <= 5f)
+            {
+                // Nothing
+            }
+        }
+    }
+    #endregion
+
     void FixedUpdate()
     {
         MoveIt();
@@ -180,8 +204,14 @@ public class CharacterBehaviour : MonoBehaviour
 
     void Start()
     {
+        //SetRigidBody();
         PartialTime(out partialTime); // Start With Delay (less robotic)
         PickState();
         StartCoroutine("RefreshState");
+    }
+
+    void Awake()
+    {
+        SetRigidBody();
     }
 }

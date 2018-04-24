@@ -29,7 +29,7 @@ public class Manager : MonoBehaviour
     // End Scene Characters
 
     // Canvas
-    List<GameObject> coz = new List<GameObject>(); // Store Game Objects
+    public static List<GameObject> coz = new List<GameObject>(); // Store Game Objects
     public Text[] text;
     public Image[] images;
     Color onlyAlpha;

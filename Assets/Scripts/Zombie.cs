@@ -5,9 +5,8 @@ namespace NPC
 {
     namespace Enemy
     {
-        public class Zombie : MonoBehaviour
+        public class Zombie : CharacterBehaviour
         {
-            public ZombieProperties zombieProperties;
             Color zColor;
             GameObject[] goCitizens;
             GameObject atStake;
@@ -25,11 +24,11 @@ namespace NPC
                 sc.radius = 5f; // Zombie Sight Range (5 units)
                 // End Collision Message
 
-                zombieBody.AddComponent<Rigidbody>();
-                Rigidbody rb = zombieBody.GetComponent<Rigidbody>();
-                rb.interpolation = RigidbodyInterpolation.Extrapolate;
-                rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-                rb.constraints = RigidbodyConstraints.FreezeRotation;
+                //zombieBody.AddComponent<Rigidbody>();
+                //Rigidbody rb = zombieBody.GetComponent<Rigidbody>();
+                //rb.interpolation = RigidbodyInterpolation.Extrapolate;
+                //rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+                //rb.constraints = RigidbodyConstraints.FreezeRotation;
 
                 zombieBody.GetComponent<Renderer>().material.SetColor("_Color", color); // Set Object Color
             }
@@ -71,9 +70,8 @@ namespace NPC
                     if (cComp != null) atStake = go;
                 }
 
-                gameObject.AddComponent<CharacterBehaviour>();
-                gameObject.GetComponent<CharacterBehaviour>().Init(gameObject, ZombieSpeed()); // Movement
-                gameObject.GetComponent<CharacterBehaviour>().DisplayDrawLine(atStake, zColor , "Long"); // Gizmos
+                Init(gameObject, ZombieSpeed()); // Movement
+                DisplayDrawLine(atStake, zColor , "Long"); // Gizmos
             }
             #endregion
         }

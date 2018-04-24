@@ -5,9 +5,8 @@ namespace NPC
 {
     namespace Ally
     {
-        public class Citizen : MonoBehaviour
+        public class Citizen : CharacterBehaviour
         {
-            public CitizenProperties citizenProperties;
             GameObject[] goZombies;
             GameObject atStake;
             
@@ -23,11 +22,11 @@ namespace NPC
                 sc.radius = 1f;
                 // End Collison Message
 
-                CitizenBody.AddComponent<Rigidbody>();
-                Rigidbody rb = CitizenBody.GetComponent<Rigidbody>();
-                rb.interpolation = RigidbodyInterpolation.Extrapolate;
-                rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-                rb.constraints = RigidbodyConstraints.FreezeRotation;
+                //CitizenBody.AddComponent<Rigidbody>();
+                //Rigidbody rb = CitizenBody.GetComponent<Rigidbody>();
+                //rb.interpolation = RigidbodyInterpolation.Extrapolate;
+                //rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+                //rb.constraints = RigidbodyConstraints.FreezeRotation;
 
                 CitizenBody.transform.localScale = new Vector3(1f, 1f, 1f); // Resize Object
                 CitizenBody.GetComponent<Renderer>().material.SetColor("_Color", Color.yellow); // Set Object Color
@@ -71,9 +70,9 @@ namespace NPC
                     if (zComp != null) atStake = go;
                 }
 
-                gameObject.AddComponent<CharacterBehaviour>();
-                gameObject.GetComponent<CharacterBehaviour>().Init(gameObject, CitizenSpeed(citizenProperties.age)); // Movement
-                gameObject.GetComponent<CharacterBehaviour>().DisplayDrawLine(atStake, Color.yellow, "Long"); // Gismoz
+                Init(gameObject, CitizenSpeed(citizenProperties.age)); // Movement
+                DisplayDrawLine(atStake, Color.yellow, "Long"); // Gismoz
+
             }
             #endregion
         }
