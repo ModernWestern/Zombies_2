@@ -68,28 +68,6 @@ public class Manager : MonoBehaviour
         return planeScene;
     }
 
-    Color ZombieColor() // Color Generator
-    {
-        Color zombie;
-        int setColor = Random.Range(0, 3); // Random Color
-        switch (setColor)
-        {
-            case 0:
-                zombie = Color.cyan;
-                break;
-            case 1:
-                zombie = Color.magenta;
-                break;
-            case 2:
-                zombie = Color.green;
-                break;
-            default:
-                zombie = Color.white;
-                break;
-        }
-        return zombie;
-    }
-
     string CharacterNames() // Name Generator
     {
         string[] characterNames; // Store Names
@@ -121,7 +99,7 @@ public class Manager : MonoBehaviour
             {
                 case 0:
                     zObject = GameObject.CreatePrimitive(PrimitiveType.Cube); // Create Cube
-                    zObject.AddComponent<Zombie>().Init(zObject, ZombieColor());
+                    zObject.AddComponent<Zombie>().Init(zObject, CharacterAge());
                     zObject.transform.SetParent(zombieManager.transform); // Parenting to Manager
                     zObject.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Cube Random Positipon
                     coz.Add(zObject); // Fill List (Display Quantity Canvas)

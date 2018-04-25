@@ -62,17 +62,26 @@ public class CharacterBehaviour : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
-    public void Init(GameObject sortCharacter, float speed)
+    float SpeedPerAge(int age) // Use age property to set speed
+    {
+        float speed = 0f;
+        if (age >= 70) speed = 2.5f;
+        else if (age >= 30 && age < 70) speed = 5f;
+        else if (age >= 15 && age < 30) speed = 7.5f;
+        return speed;
+    }
+
+    public void Init(GameObject sortCharacter)
     {
         switch (sortCharacter.tag)
         {
             case "Zombie":
                 setBehaviour.behaviour = zombieProperties.behaviour;
-                setBehaviour.speed = speed;
+                setBehaviour.speed = SpeedPerAge(zombieProperties.age);
                 break;
             case "Citizen":
                 setBehaviour.behaviour = citizenProperties.behaviour;
-                setBehaviour.speed = speed;
+                setBehaviour.speed = SpeedPerAge(citizenProperties.age);
                 break;
             default:
                 print("Error");
@@ -96,7 +105,7 @@ public class CharacterBehaviour : MonoBehaviour
 
         if (setBehaviour.behaviour == Behaviour.getMove)
         {
-            whichWay = Random.Range(0, 2);
+            whichWay = Random.Range(0, 2); // Forward or Backward
             StartCoroutine("RefreshState");
         }
         else if (setBehaviour.behaviour == Behaviour.getIdle)
@@ -111,7 +120,8 @@ public class CharacterBehaviour : MonoBehaviour
         }
         else if (setBehaviour.behaviour == Behaviour.setAttack)
         {
-            whichWay = 5; // Attack
+            React();
+            print("ATTCK");
         }
     }
 
@@ -135,11 +145,6 @@ public class CharacterBehaviour : MonoBehaviour
                     break;
                 case 4:
                     transform.Translate(Vector3.up * (.075f * Mathf.Sin(1)));
-                    break;
-                case 5:
-                    direction = Vector3.Normalize(target.transform.position - transform.position);
-                    transform.position += direction * .1f;
-                    print("ATTACK");
                     break;
                 default:
                     print("Nothing");
@@ -182,11 +187,11 @@ public class CharacterBehaviour : MonoBehaviour
     }
     #endregion
 
-    #region BecomeToZombie
+    #region Citizen And Zombie React
 
-    public virtual void Respond()
+    public virtual void React()
     {
-        foreach(GameObject go in Manager.coz)
+        foreach (GameObject go in Manager.coz)
         {
             float dist = Vector3.Distance(go.transform.position, transform.position);
             if (dist <= 5f)
@@ -196,22 +201,22 @@ public class CharacterBehaviour : MonoBehaviour
         }
     }
     #endregion
-
-    void FixedUpdate()
+    
+    void Awake()
     {
-        MoveIt();
+        SetRigidBody();
     }
 
-    void Start()
+    public virtual void Start() // Class Citizen or Class Zombie Gonna Take Control About Start()
     {
-        //SetRigidBody();
         PartialTime(out partialTime); // Start With Delay (less robotic)
         PickState();
         StartCoroutine("RefreshState");
     }
 
-    void Awake()
+    void FixedUpdate()
     {
-        SetRigidBody();
+        MoveIt(); // Move
+        React();
     }
 }

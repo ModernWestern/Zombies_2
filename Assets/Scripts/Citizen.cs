@@ -8,7 +8,6 @@ namespace NPC
         public class Citizen : CharacterBehaviour
         {
             GameObject[] goZombies;
-            GameObject atStake;
             
             #region Init
 
@@ -21,12 +20,6 @@ namespace NPC
                 sc.isTrigger = true;
                 sc.radius = 1f;
                 // End Collison Message
-
-                //CitizenBody.AddComponent<Rigidbody>();
-                //Rigidbody rb = CitizenBody.GetComponent<Rigidbody>();
-                //rb.interpolation = RigidbodyInterpolation.Extrapolate;
-                //rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-                //rb.constraints = RigidbodyConstraints.FreezeRotation;
 
                 CitizenBody.transform.localScale = new Vector3(1f, 1f, 1f); // Resize Object
                 CitizenBody.GetComponent<Renderer>().material.SetColor("_Color", Color.yellow); // Set Object Color
@@ -48,31 +41,53 @@ namespace NPC
                 return message;
             }
 
-            float CitizenSpeed(int age) // Use citizen age property to set speed
+            public override void React()
             {
-                float speed = 0f;
-                if (age >= 70) speed = 2.5f;
-                else if (age >= 30 && age < 70) speed = 5f;
-                else if (age >= 15 && age < 30) speed = 7.5f;
-                return speed;
+                foreach (GameObject go in Manager.coz)
+                {
+                    if(go.GetComponent<Zombie>()) // Citizen Run From zombie
+                    {
+                        float dist = Vector3.Distance(go.transform.position, transform.position);
+
+                        if(dist <= 5)
+                        {
+                            citizenProperties.behaviour = Behaviour.setAttack;
+                            transform.position = Vector3.MoveTowards(transform.position, go.transform.position, -1f);
+                        }
+                    }
+                }
             }
             #endregion
 
             #region Main Methods
 
-            void Start()
+            public override void Start()
             {
-                goZombies = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+                Init(gameObject); // Movement
+                base.Start(); // Start Start() from CharacterBehaviour()
+            }
 
-                foreach (GameObject go in goZombies)
+            void Update()
+            {
+                // Gizmos
+                goZombies = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+                float distMin = 1000;
+                int index = 0;
+
+                for (int i = 0; i < goZombies.Length; i++)
                 {
-                    Component zComp = go.GetComponent(typeof(Zombie)); // Any Object With This Component Gonna Be Chased
-                    if (zComp != null) atStake = go;
+                    if (goZombies[i].GetComponent<Zombie>()) // Find Zombies
+                    { 
+                        if (distMin > Vector3.Distance(transform.position, goZombies[i].transform.position))
+                        {
+                            distMin = Vector3.Distance(transform.position, goZombies[i].transform.position);
+                            index = i;
+                        }
+                    }
                 }
 
-                Init(gameObject, CitizenSpeed(citizenProperties.age)); // Movement
-                DisplayDrawLine(atStake, Color.yellow, "Long"); // Gismoz
-
+                DisplayDrawLine(goZombies[index], Color.yellow, "Long"); // Gizmos
+                // End Gizmos
             }
             #endregion
         }
