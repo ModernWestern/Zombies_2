@@ -1,11 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
+using NPC.Ally;
+using NPC.Enemy;
 
 public struct SetBehaviour // Store a Behaviour in Regards With a Sort Of Character
 {
     public Behaviour behaviour;
     public float speed;
+    public GameObject sortGo;
 }
+
+[RequireComponent(typeof(Rigidbody))]
 
 public class CharacterBehaviour : MonoBehaviour
 {
@@ -54,8 +59,7 @@ public class CharacterBehaviour : MonoBehaviour
     #region Character Behaviour
 
     void SetRigidBody()
-    {
-        gameObject.AddComponent<Rigidbody>();
+    {        
         Rigidbody rb = gameObject.GetComponent<Rigidbody>();
         rb.interpolation = RigidbodyInterpolation.Extrapolate;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -73,7 +77,9 @@ public class CharacterBehaviour : MonoBehaviour
 
     public void Init(GameObject sortCharacter)
     {
-        switch (sortCharacter.tag)
+        setBehaviour.sortGo = sortCharacter;
+
+        switch (setBehaviour.sortGo.tag)
         {
             case "Zombie":
                 setBehaviour.behaviour = zombieProperties.behaviour;
@@ -118,7 +124,7 @@ public class CharacterBehaviour : MonoBehaviour
             whichWay = 3; // Rotate Case
             StartCoroutine("RefreshState");
         }
-        else if (setBehaviour.behaviour == Behaviour.setAttack)
+        else if (setBehaviour.behaviour == Behaviour.getReaction)
         {
             React();
             print("ATTCK");
@@ -189,16 +195,43 @@ public class CharacterBehaviour : MonoBehaviour
 
     #region Citizen And Zombie React
 
-    public virtual void React()
+    void React() // Attack/RunAway
     {
         foreach (GameObject go in Manager.coz)
         {
-            float dist = Vector3.Distance(go.transform.position, transform.position);
-            if (dist <= 5f)
+            if (setBehaviour.sortGo.tag == "Zombie")
             {
-                // Nothing
+                if (go.GetComponent<Hero>() || go.GetComponent<Citizen>()) // Zombie Attack Citizens and Hero
+                {
+                    float dist = Vector3.Distance(go.transform.position, transform.position);
+
+                    if (dist <= 5)
+                    {
+                        StopCoroutine(RefreshState()); // Stop Case Behaviours
+                        zombieProperties.behaviour = Behaviour.getReaction;
+                        transform.position = Vector3.MoveTowards(transform.position, go.transform.position, (setBehaviour.speed / 15));
+                    }
+                    else if (dist == .1f) setBehaviour.behaviour = Behaviour.getIdle; 
+                    //else StartCoroutine(RefreshState()); // Start Case Behaviours
+                }
             }
-        }
+            if (setBehaviour.sortGo.tag == "Citizen")
+            {
+                if (go.GetComponent<Zombie>()) // Citizen Run From zombie
+                {
+                    float dist = Vector3.Distance(go.transform.position, transform.position);
+
+                    if (dist <= 5)
+                    {
+                        StopCoroutine(RefreshState()); // Stop Case Behaviours
+                        citizenProperties.behaviour = Behaviour.getReaction;
+                        transform.position = Vector3.MoveTowards(transform.position, go.transform.position, -(setBehaviour.speed / 15));
+                    }
+                    else if (dist == .1f) setBehaviour.behaviour = Behaviour.getIdle;
+                    //else StartCoroutine(RefreshState()); // Start Case Behaviours
+                }
+            }
+        }  
     }
     #endregion
     

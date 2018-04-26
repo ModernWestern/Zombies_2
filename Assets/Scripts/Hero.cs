@@ -110,13 +110,13 @@ public class Hero : MonoBehaviour
                 messages.text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
                 messages.color = zombie.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
 
-                zombieProperties.behaviour = Behaviour.setAttack;
+                zombieProperties.behaviour = Behaviour.getReaction;
             }
             else // If Zombie bodyPart is !null Just Print
             {
                 messages.text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
                 messages.color = zombie.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
-                zombieProperties.behaviour = Behaviour.setAttack;
+                zombieProperties.behaviour = Behaviour.getReaction;
             }
         }
         // End Zombie Taste

@@ -5,6 +5,7 @@ namespace NPC
 {
     namespace Ally
     {
+        [System.Serializable]
         public class Citizen : CharacterBehaviour
         {
             GameObject[] goZombies;
@@ -41,22 +42,14 @@ namespace NPC
                 return message;
             }
 
-            public override void React()
+            public static implicit operator Zombie(Citizen citizen) // Become Zombie ***
             {
-                foreach (GameObject go in Manager.coz)
-                {
-                    if(go.GetComponent<Zombie>()) // Citizen Run From zombie
-                    {
-                        float dist = Vector3.Distance(go.transform.position, transform.position);
-
-                        if(dist <= 5)
-                        {
-                            citizenProperties.behaviour = Behaviour.setAttack;
-                            transform.position = Vector3.MoveTowards(transform.position, go.transform.position, -1f);
-                        }
-                    }
-                }
+                Zombie zombie = citizen.gameObject.AddComponent<Zombie>();
+                zombie.zombieProperties.age = citizen.citizenProperties.age;
+                Destroy(citizen);
+                return zombie;
             }
+
             #endregion
 
             #region Main Methods

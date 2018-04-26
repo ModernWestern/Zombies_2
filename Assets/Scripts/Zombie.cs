@@ -5,6 +5,7 @@ namespace NPC
 {
     namespace Enemy
     {
+        [System.Serializable]
         public class Zombie : CharacterBehaviour
         {
             GameObject[] goCitizens;
@@ -24,7 +25,6 @@ namespace NPC
                 // End Collision Message
 
                 zombieProperties.age = age;
-                zombieBody.GetComponent<Renderer>().material.SetColor("_Color", ZombieColor()); // Set Object Color
             }
             #endregion
 
@@ -42,26 +42,18 @@ namespace NPC
             Color ZombieColor()
             {
                 Color color = new Color();
-                if (this.zombieProperties.age >= 70) color = Color.green;
-                if (this.zombieProperties.age >= 30 && this.zombieProperties.age < 70) color = Color.magenta;
-                if (this.zombieProperties.age >= 15 && this.zombieProperties.age < 30) color = Color.cyan;
+                if (zombieProperties.age >= 70) color = Color.green;
+                if (zombieProperties.age >= 30 && zombieProperties.age < 70) color = Color.magenta;
+                if (zombieProperties.age >= 15 && zombieProperties.age < 30) color = Color.cyan;
                 return color;
             }
 
-            public override void React()
+            void OnCollisionEnter(Collision collision) // Bite ***
             {
-                foreach (GameObject go in Manager.coz)
+                if (collision.gameObject.GetComponent<Citizen>())
                 {
-                    if (go.GetComponent<Hero>() || go.GetComponent<Citizen>()) // Zombie Attack Citizens and Hero
-                    {
-                        float dist = Vector3.Distance(go.transform.position, transform.position);
-
-                        if (dist <= 5)
-                        {
-                            zombieProperties.behaviour = Behaviour.setAttack;
-                            transform.position = Vector3.MoveTowards(transform.position, go.transform.position, .1f);
-                        }
-                    }
+                    Citizen c = collision.gameObject.GetComponent<Citizen>();
+                    Zombie z = c;
                 }
             }
             #endregion
@@ -70,6 +62,7 @@ namespace NPC
 
             public override void Start()
             {
+                gameObject.GetComponent<Renderer>().material.SetColor("_Color", ZombieColor()); // Set Object Color
                 zName = ZombieName(ZombieColor());
                 zombieProperties.bodyPart = " "; // "null", No Taste Yet
                 Init(gameObject); // Movement
