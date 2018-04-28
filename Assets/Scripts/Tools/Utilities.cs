@@ -4,6 +4,7 @@ public enum Taste { Brain, Legs, Arms, Eyes, Neck, Lenght }
 public struct ZombieProperties
 {
     public int age;
+    public string name;
     public Taste taste;
     public string bodyPart;
     public Behaviour behaviour;

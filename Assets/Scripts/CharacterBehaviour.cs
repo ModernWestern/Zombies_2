@@ -7,18 +7,18 @@ public struct SetBehaviour // Store a Behaviour in Regards With a Sort Of Charac
 {
     public Behaviour behaviour;
     public float speed;
-    public GameObject sortGo;
 }
 
 [RequireComponent(typeof(Rigidbody))]
 
 public class CharacterBehaviour : MonoBehaviour
 {
+    public static bool zombiefied; // Check If You've Already been Bitten
+
     // Display Gizmos
     GameObject target;
     Vector3 direction;
     Color lineColor;
-    string lenght;
     // End Display Gizmos
 
     public SetBehaviour setBehaviour;
@@ -30,28 +30,19 @@ public class CharacterBehaviour : MonoBehaviour
 
     #region Gizmos
 
-    public void DisplayDrawLine(GameObject obj, Color color, string lineLenght)
+    public void DisplayDrawLine(GameObject obj, Color color)
     {
         target = obj;
         lineColor = color;
-        lenght = lineLenght;
     }
 
     public void OnDrawGizmos()
     {
         Gizmos.color = lineColor;
 
-        switch (lenght)
+        if (Manager.gizmoSwitch == true)
         {
-            case "Short":
-                Gizmos.DrawLine(transform.position, transform.position + direction);
-                break;
-            case "Long":
-                Gizmos.DrawLine(transform.position, target.transform.position);
-                break;
-            default:
-                print("Nothing");
-                break;
+            Gizmos.DrawLine(transform.position, target.transform.position);
         }
     }
     #endregion
@@ -69,17 +60,15 @@ public class CharacterBehaviour : MonoBehaviour
     float SpeedPerAge(int age) // Use age property to set speed
     {
         float speed = 0f;
-        if (age >= 70) speed = 2.5f;
-        else if (age >= 30 && age < 70) speed = 5f;
+        if (age >= 70) speed = Random.Range (2.5f, 3.6f);
+        else if (age >= 30 && age < 70) speed = Random.Range(5f, 6.1f);
         else if (age >= 15 && age < 30) speed = 7.5f;
         return speed;
     }
 
-    public void Init(GameObject sortCharacter)
+    public void COZ()
     {
-        setBehaviour.sortGo = sortCharacter;
-
-        switch (setBehaviour.sortGo.tag)
+        switch (gameObject.tag)
         {
             case "Zombie":
                 setBehaviour.behaviour = zombieProperties.behaviour;
@@ -126,8 +115,9 @@ public class CharacterBehaviour : MonoBehaviour
         }
         else if (setBehaviour.behaviour == Behaviour.getReaction)
         {
-            React();
-            print("ATTCK");
+            whichWay = 5; // ******************
+            //StopCoroutine("RefreshState"); // *********************
+            print("ATTACK"); // ***********************
         }
     }
 
@@ -151,6 +141,9 @@ public class CharacterBehaviour : MonoBehaviour
                     break;
                 case 4:
                     transform.Translate(Vector3.up * (.075f * Mathf.Sin(1)));
+                    break;
+                case 5:
+                    print("HHHHHHHHH");
                     break;
                 default:
                     print("Nothing");
@@ -199,42 +192,40 @@ public class CharacterBehaviour : MonoBehaviour
     {
         foreach (GameObject go in Manager.coz)
         {
-            if (setBehaviour.sortGo.tag == "Zombie")
+            if (gameObject.tag == "Zombie")
             {
                 if (go.GetComponent<Hero>() || go.GetComponent<Citizen>()) // Zombie Attack Citizens and Hero
                 {
                     float dist = Vector3.Distance(go.transform.position, transform.position);
 
-                    if (dist <= 5)
+                    if (dist <= 15 && dist >= .1f)
                     {
                         StopCoroutine(RefreshState()); // Stop Case Behaviours
-                        zombieProperties.behaviour = Behaviour.getReaction;
-                        transform.position = Vector3.MoveTowards(transform.position, go.transform.position, (setBehaviour.speed / 15));
+                        setBehaviour.behaviour = Behaviour.getReaction;
+                        float dynamicSpeed = Mathf.Clamp(dist * 4, 40, 60); // As Much Closer, Faster
+                        transform.position = Vector3.MoveTowards(transform.position, go.transform.position, setBehaviour.speed / dynamicSpeed);
                     }
-                    else if (dist == .1f) setBehaviour.behaviour = Behaviour.getIdle; 
-                    //else StartCoroutine(RefreshState()); // Start Case Behaviours
                 }
             }
-            if (setBehaviour.sortGo.tag == "Citizen")
+            if (gameObject.tag == "Citizen")
             {
                 if (go.GetComponent<Zombie>()) // Citizen Run From zombie
                 {
                     float dist = Vector3.Distance(go.transform.position, transform.position);
 
-                    if (dist <= 5)
+                    if (dist <= 15 && dist >= .1f)
                     {
                         StopCoroutine(RefreshState()); // Stop Case Behaviours
-                        citizenProperties.behaviour = Behaviour.getReaction;
-                        transform.position = Vector3.MoveTowards(transform.position, go.transform.position, -(setBehaviour.speed / 15));
+                        setBehaviour.behaviour = Behaviour.getReaction;
+                        float dynamicSpeed = Mathf.Clamp(dist * 4, 40, 60); // As Much Closer, Faster
+                        transform.position = Vector3.MoveTowards(transform.position, go.transform.position, -setBehaviour.speed / dynamicSpeed);
                     }
-                    else if (dist == .1f) setBehaviour.behaviour = Behaviour.getIdle;
-                    //else StartCoroutine(RefreshState()); // Start Case Behaviours
                 }
             }
-        }  
+        }
     }
     #endregion
-    
+
     void Awake()
     {
         SetRigidBody();
@@ -242,6 +233,7 @@ public class CharacterBehaviour : MonoBehaviour
 
     public virtual void Start() // Class Citizen or Class Zombie Gonna Take Control About Start()
     {
+        COZ();
         PartialTime(out partialTime); // Start With Delay (less robotic)
         PickState();
         StartCoroutine("RefreshState");

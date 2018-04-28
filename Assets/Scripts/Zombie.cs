@@ -5,25 +5,16 @@ namespace NPC
 {
     namespace Enemy
     {
-        [System.Serializable]
+        [RequireComponent(typeof(SphereCollider))]
+
         public class Zombie : CharacterBehaviour
         {
             GameObject[] goCitizens;
-            string zName;
 
             #region Init
 
             public void Init(GameObject zombieBody, int age) // Zombie Generator
             {
-                // Collision Message
-                zombieBody.name = zName;
-                zombieBody.tag = "Zombie";
-                zombieBody.AddComponent<SphereCollider>();
-                SphereCollider sc = zombieBody.GetComponent<SphereCollider>();
-                sc.isTrigger = true;
-                sc.radius = 5f; // Zombie Sight Range (5 units)
-                // End Collision Message
-
                 zombieProperties.age = age;
             }
             #endregion
@@ -63,9 +54,20 @@ namespace NPC
             public override void Start()
             {
                 gameObject.GetComponent<Renderer>().material.SetColor("_Color", ZombieColor()); // Set Object Color
-                zName = ZombieName(ZombieColor());
+
+                // Name
+                if (zombiefied == false) gameObject.name = ZombieName(ZombieColor());
+                else if (zombiefied == true) gameObject.name = gameObject.name + " (" + ZombieName(gameObject.GetComponent<Renderer>().material.color) + ")";
+                // End Name
+
+                // Collision Message
+                gameObject.tag = "Zombie";
+                SphereCollider sc = gameObject.GetComponent<SphereCollider>();
+                sc.isTrigger = true;
+                sc.radius = 5f; // Zombie Sight Range (5 units)
                 zombieProperties.bodyPart = " "; // "null", No Taste Yet
-                Init(gameObject); // Movement
+                // End Collision Message
+                
                 base.Start(); // Start Start() from CharacterBehaviour()
             }
 
@@ -73,7 +75,7 @@ namespace NPC
             {
                 // Gizmos
                 goCitizens = FindObjectsOfType(typeof(GameObject)) as GameObject[];
-                float distMin = 1000;
+                float distMin = 1000; // Minimum Value Gonna Be This Until Something Become Smaller
                 int index = 0;
 
                 for (int i = 0; i < goCitizens.Length; i++)
@@ -88,7 +90,7 @@ namespace NPC
                     }
                 }
 
-                DisplayDrawLine(goCitizens[index], ZombieColor(), "Long"); // Gizmos
+                DisplayDrawLine(goCitizens[index], ZombieColor()); // Gizmos
                 // End Gizmos
             }
             #endregion

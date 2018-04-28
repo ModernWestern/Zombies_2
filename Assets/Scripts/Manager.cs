@@ -19,6 +19,11 @@ public class MinSpawn
 
 public class Manager : MonoBehaviour
 {
+    // Gizmos
+    public static bool gizmoSwitch; 
+    public bool displayGizmos; 
+    // End Gizmos
+
     public string namesFile; // Public Field To Type File Name
     public bool cursorLock = false;
 
@@ -63,7 +68,7 @@ public class Manager : MonoBehaviour
         GameObject planeScene = GameObject.CreatePrimitive(PrimitiveType.Plane); // Create a GameObject
         planeScene.name = "Surface";
         planeScene.transform.position = new Vector3(0f, 0f, 0f);
-        planeScene.transform.localScale = new Vector3(10f, 10f, 10f);
+        planeScene.transform.localScale = new Vector3(15f, 15f, 15f);
         planeScene.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
         return planeScene;
     }
@@ -142,6 +147,11 @@ public class Manager : MonoBehaviour
         MinSpawn ms = new MinSpawn(ref RandomMin);
         CoZ(Random.Range(ms.Min, ConstMax)); // Random Amount
         // END CITIZEN AND ZOMBIES
+    }
+
+    void Update()
+    {
+        gizmoSwitch = displayGizmos;
 
         // CANVAS
         DisplayQuantity();

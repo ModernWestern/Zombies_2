@@ -5,7 +5,8 @@ namespace NPC
 {
     namespace Ally
     {
-        [System.Serializable]
+        [RequireComponent(typeof(SphereCollider))]
+
         public class Citizen : CharacterBehaviour
         {
             GameObject[] goZombies;
@@ -14,16 +15,7 @@ namespace NPC
 
             public void Init(GameObject CitizenBody, string name, int age)
             {
-                // Collision Message
-                CitizenBody.tag = "Citizen";
-                CitizenBody.AddComponent<SphereCollider>();
-                SphereCollider sc = CitizenBody.GetComponent<SphereCollider>();
-                sc.isTrigger = true;
-                sc.radius = 1f;
-                // End Collison Message
-
                 CitizenBody.transform.localScale = new Vector3(1f, 1f, 1f); // Resize Object
-                CitizenBody.GetComponent<Renderer>().material.SetColor("_Color", Color.yellow); // Set Object Color
                 CitizenBody.name = name + " " + age; // Set Object Name
 
                 citizenProperties.age = age;
@@ -44,9 +36,11 @@ namespace NPC
 
             public static implicit operator Zombie(Citizen citizen) // Become Zombie ***
             {
+                zombiefied = true; // Yeah, You're a Zombie Already
                 Zombie zombie = citizen.gameObject.AddComponent<Zombie>();
-                zombie.zombieProperties.age = citizen.citizenProperties.age;
-                Destroy(citizen);
+                zombie.zombieProperties.age = citizen.citizenProperties.age; // Keep Citizen Age After Be Bitten
+                zombie.zombieProperties.name = citizen.citizenProperties.name; // Keep Citizen Name After Be Bitten
+                Destroy(citizen); // Ain't Citizen Anymore
                 return zombie;
             }
 
@@ -56,7 +50,15 @@ namespace NPC
 
             public override void Start()
             {
-                Init(gameObject); // Movement
+                gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.yellow); // Set Object Color
+
+                // Collision Message
+                gameObject.tag = "Citizen";
+                SphereCollider sc = gameObject.GetComponent<SphereCollider>();
+                sc.isTrigger = true;
+                sc.radius = 1f;
+                // End Collison Message
+                
                 base.Start(); // Start Start() from CharacterBehaviour()
             }
 
@@ -64,7 +66,7 @@ namespace NPC
             {
                 // Gizmos
                 goZombies = FindObjectsOfType(typeof(GameObject)) as GameObject[];
-                float distMin = 1000;
+                float distMin = 1000; // Minimum Value Gonna Be This Until Something Become Smaller
                 int index = 0;
 
                 for (int i = 0; i < goZombies.Length; i++)
@@ -79,7 +81,7 @@ namespace NPC
                     }
                 }
 
-                DisplayDrawLine(goZombies[index], Color.yellow, "Long"); // Gizmos
+                DisplayDrawLine(goZombies[index], Color.yellow); // Gizmos
                 // End Gizmos
             }
             #endregion
