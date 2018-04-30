@@ -30,7 +30,7 @@ namespace NPC
                 return name;
             }
 
-            Color ZombieColor()
+            Color ZombieColor() // Color In Regards With Age
             {
                 Color color = new Color();
                 if (zombieProperties.age >= 70) color = Color.green;
@@ -56,8 +56,8 @@ namespace NPC
                 gameObject.GetComponent<Renderer>().material.SetColor("_Color", ZombieColor()); // Set Object Color
 
                 // Name
-                if (zombiefied == false) gameObject.name = ZombieName(ZombieColor());
-                else if (zombiefied == true) gameObject.name = gameObject.name + " (" + ZombieName(gameObject.GetComponent<Renderer>().material.color) + ")";
+                if (zombiefied == false) gameObject.name = ZombieName(ZombieColor()); // Natural Zombie Name
+                else if (zombiefied == true) gameObject.name = gameObject.name + " (" + ZombieName(gameObject.GetComponent<Renderer>().material.color) + ")"; // Keep Citizen Name
                 // End Name
 
                 // Collision Message

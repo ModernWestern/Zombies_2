@@ -19,13 +19,14 @@ public class MinSpawn
 
 public class Manager : MonoBehaviour
 {
+    public string namesFile; // Public Field To Type File Name
+    public bool cursorLock = false;
+    public static List<GameObject> allGo = new List<GameObject>(); // Store Game Objects
+
     // Gizmos
     public static bool gizmoSwitch; 
     public bool displayGizmos; 
     // End Gizmos
-
-    public string namesFile; // Public Field To Type File Name
-    public bool cursorLock = false;
 
     // Scene Characters
     GameObject hero;
@@ -34,7 +35,6 @@ public class Manager : MonoBehaviour
     // End Scene Characters
 
     // Canvas
-    public static List<GameObject> coz = new List<GameObject>(); // Store Game Objects
     public Text[] text;
     public Image[] images;
     Color onlyAlpha;
@@ -51,7 +51,7 @@ public class Manager : MonoBehaviour
     {
         int zombieQ = 0;
         int citizenQ = 0;
-        foreach (GameObject gameObjecs in coz)
+        foreach (GameObject gameObjecs in allGo)
         {
             if (gameObjecs.tag == "Zombie") zombieQ++;
             else if (gameObjecs.tag == "Citizen") citizenQ++;
@@ -68,7 +68,7 @@ public class Manager : MonoBehaviour
         GameObject planeScene = GameObject.CreatePrimitive(PrimitiveType.Plane); // Create a GameObject
         planeScene.name = "Surface";
         planeScene.transform.position = new Vector3(0f, 0f, 0f);
-        planeScene.transform.localScale = new Vector3(15f, 15f, 15f);
+        planeScene.transform.localScale = new Vector3(10f, 10f, 10f);
         planeScene.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
         return planeScene;
     }
@@ -107,14 +107,14 @@ public class Manager : MonoBehaviour
                     zObject.AddComponent<Zombie>().Init(zObject, CharacterAge());
                     zObject.transform.SetParent(zombieManager.transform); // Parenting to Manager
                     zObject.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Cube Random Positipon
-                    coz.Add(zObject); // Fill List (Display Quantity Canvas)
+                    allGo.Add(zObject); // Fill List (Display Quantity Canvas)
                     break;
                 case 1:
                     cObject = GameObject.CreatePrimitive(PrimitiveType.Cube); // Create Cube
                     cObject.AddComponent<Citizen>().Init(cObject, CharacterNames(), CharacterAge()); // Citizen Info*
                     cObject.transform.SetParent(citizenManager.transform); // Parenting to Manager
                     cObject.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Cube Random Positipon
-                    coz.Add(cObject); // Fill List (Display Quantity Canvas)
+                    allGo.Add(cObject); // Fill List (Display Quantity Canvas)
                     break;
                 default:
                     print("Nothing");
@@ -140,18 +140,20 @@ public class Manager : MonoBehaviour
         hero = GameObject.CreatePrimitive(PrimitiveType.Capsule); // Create an Object
         hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge(), text[2], images[0]);
         hero.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Random Position
+        allGo.Add(hero);
         // END HERO
 
-        // CITIZEN AND ZOMBIES
-        RandomMin = Random.Range(5, 16);
-        MinSpawn ms = new MinSpawn(ref RandomMin);
-        CoZ(Random.Range(ms.Min, ConstMax)); // Random Amount
+        //// CITIZEN AND ZOMBIES
+        //RandomMin = Random.Range(5, 16);
+        //MinSpawn ms = new MinSpawn(ref RandomMin);
+        //CoZ(Random.Range(ms.Min, ConstMax)); // Random Amount
+        CoZ(1);
         // END CITIZEN AND ZOMBIES
     }
 
     void Update()
     {
-        gizmoSwitch = displayGizmos;
+        gizmoSwitch = displayGizmos; // Inspector
 
         // CANVAS
         DisplayQuantity();

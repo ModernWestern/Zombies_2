@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using NPC.Ally;
 using NPC.Enemy;
@@ -23,13 +23,12 @@ public class CharacterBehaviour : MonoBehaviour
     Color lineColor;
     // End Display Gizmos
 
+    bool checkCourutine;
+    public static bool zombiefied; // Check If You've Already been Bitten
     public SetBehaviour setBehaviour;
     public ZombieProperties zombieProperties;
     public CitizenProperties citizenProperties;
-    int fob; // Forward Or Backward
     float partialTime;
-    bool checkCourutine;
-    public static bool zombiefied; // Check If You've Already been Bitten
 
     #region Gizmos
 
@@ -92,15 +91,12 @@ public class CharacterBehaviour : MonoBehaviour
 
     IEnumerator RefreshState() // Every 3 seconds call PickState
     {
-        PartialTime(out partialTime); // Start With Delay (less robotic)
-        checkCourutine = true;
-        setBehaviour.behaviour = (Behaviour)Random.Range(0, 3);
-        fob = Random.Range(0, 2); // Forward Or Backward
         yield return new WaitForSeconds(partialTime);
-        checkCourutine = false;
         PartialTime(out partialTime); // Make PartialTime() a New Value Each Call
-        yield return new WaitForSeconds(partialTime);
-        StartCoroutine(RefreshState());
+        int randomBehaviour = Random.Range(0, 3);
+        setBehaviour.behaviour = (Behaviour)randomBehaviour;
+        StopCoroutine(RefreshState());
+        checkCourutine = true;
     }
 
     void MoveIt() // Move Zombie Randomly
@@ -110,17 +106,18 @@ public class CharacterBehaviour : MonoBehaviour
             switch (setBehaviour.behaviour)
             {
                 case Behaviour.getMove:
+                    int fob = Random.Range(0, 2); // Forward Or Backward
                     if (fob == 0) transform.Translate(Vector3.forward * (Time.deltaTime * setBehaviour.speed), Space.Self);
                     else if (fob == 1) transform.Translate(Vector3.back * (Time.deltaTime * setBehaviour.speed), Space.Self);
-                    //print("MOV" + fob);
+                    print("MOV" + fob);
                     break;
                 case Behaviour.getIdle:
                     transform.Translate(Vector3.zero);
-                    //print("IDLE");
+                    print("IDLE");
                     break;
                 case Behaviour.getRotate:
                     transform.Rotate(Vector3.up);
-                    //print("ROT");
+                    print("ROT");
                     break;
                 case Behaviour.getReaction:
                     print("REACT");
@@ -166,8 +163,8 @@ public class CharacterBehaviour : MonoBehaviour
 
                     if (dist <= 15 && dist >= .1f)
                     {
-                        //StopCoroutine(refreshState); // Stop Case Behaviours
-                        setBehaviour.behaviour = Behaviour.getReaction;
+                        StopCoroutine(RefreshState()); // Stop Case Behaviours
+                        //setBehaviour.behaviour = Behaviour.getReaction;
                         float dynamicSpeed = Mathf.Clamp(dist * 4, 30, 60); // As Much Closer, Faster
                         transform.position = Vector3.MoveTowards(transform.position, allGo[i].transform.position, setBehaviour.speed / dynamicSpeed);
                     }
@@ -181,8 +178,8 @@ public class CharacterBehaviour : MonoBehaviour
 
                     if (dist <= 15 && dist >= .1f)
                     {
-                        //StopCoroutine(refreshState); // Stop Case Behaviours
-                        setBehaviour.behaviour = Behaviour.getReaction;
+                        StopCoroutine(RefreshState()); // Stop Case Behaviours
+                        //setBehaviour.behaviour = Behaviour.getReaction;
                         float dynamicSpeed = Mathf.Clamp(dist * 4, 30, 60); // As Much Closer, Faster
                         transform.position = Vector3.MoveTowards(transform.position, allGo[i].transform.position, -setBehaviour.speed / dynamicSpeed);
                     }
@@ -206,6 +203,7 @@ public class CharacterBehaviour : MonoBehaviour
     public virtual void Start() // Class Citizen or Class Zombie Gonna Take Control About Start()
     {
         allGo = Manager.allGo.ToArray();
+        PartialTime(out partialTime); // Start With Delay (less robotic)
         StartCoroutine(RefreshState());
         COZ();
     }
@@ -213,6 +211,7 @@ public class CharacterBehaviour : MonoBehaviour
     void FixedUpdate()
     {
         //print("Courutine: " + checkCourutine);
+
         Vector3 dontFly = gameObject.transform.position;
         dontFly.y = Mathf.Clamp(dontFly.y, -Mathf.Infinity, 1.5f);
         gameObject.transform.position = dontFly;
