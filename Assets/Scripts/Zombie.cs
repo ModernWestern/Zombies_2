@@ -9,6 +9,7 @@ namespace NPC
 
         public class Zombie : CharacterBehaviour
         {
+            Hero hero; // Set Damage To Hero
             GameObject[] goCitizens;
 
             #region Init
@@ -38,13 +39,34 @@ namespace NPC
                 if (zombieProperties.age >= 15 && zombieProperties.age < 30) color = Color.cyan;
                 return color;
             }
+            #endregion
 
-            void OnCollisionEnter(Collision collision) // Bite ***
+            #region Attack
+
+            void OnCollisionEnter(Collision collision) // Cast
             {
                 if (collision.gameObject.GetComponent<Citizen>())
                 {
                     Citizen c = collision.gameObject.GetComponent<Citizen>();
                     Zombie z = c;
+                }
+
+                if (collision.gameObject.GetComponent<Hero>()) // Damage
+                {
+                    hero = collision.gameObject.GetComponent<Hero>();
+
+                    if (gameObject.GetComponent<Renderer>().material.color == Color.cyan)
+                    {
+                        hero.BeDamaged(2);
+                    }
+                    else if (gameObject.GetComponent<Renderer>().material.color == Color.magenta)
+                    {
+                        hero.BeDamaged(1);
+                    }
+                    else if (gameObject.GetComponent<Renderer>().material.color == Color.green)
+                    {
+                        hero.BeDamaged(.5f);
+                    }
                 }
             }
             #endregion
@@ -68,7 +90,7 @@ namespace NPC
                 zombieProperties.bodyPart = " "; // "null", No Taste Yet
                 // End Collision Message
                 
-                base.Start(); // Start Start() from CharacterBehaviour()
+                base.Start(); // Start Start() from CharacterBehaviour.cs
             }
 
             void Update()

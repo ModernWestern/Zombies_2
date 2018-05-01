@@ -59,7 +59,7 @@ namespace NPC
                 sc.radius = 1f;
                 // End Collison Message
                 
-                base.Start(); // Start Start() from CharacterBehaviour()
+                base.Start(); // Start Start() from CharacterBehaviour.cs
             }
 
             void Update()

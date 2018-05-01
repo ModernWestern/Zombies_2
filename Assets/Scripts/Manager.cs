@@ -19,6 +19,7 @@ public class MinSpawn
 
 public class Manager : MonoBehaviour
 {
+    public bool inhertiTest;
     public string namesFile; // Public Field To Type File Name
     public bool cursorLock = false;
     public static List<GameObject> allGo = new List<GameObject>(); // Store Game Objects
@@ -37,6 +38,7 @@ public class Manager : MonoBehaviour
     // Canvas
     public Text[] text;
     public Image[] images;
+    public CanvasGroup blood;
     Color onlyAlpha;
     // End Canvas
 
@@ -137,17 +139,18 @@ public class Manager : MonoBehaviour
         Scene();
 
         // HERO
+        Hero.health = 20; // Set Health
         hero = GameObject.CreatePrimitive(PrimitiveType.Capsule); // Create an Object
-        hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge(), text[2], images[0]);
+        hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge(), text[2], images[0], blood);
         hero.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Random Position
         allGo.Add(hero);
         // END HERO
 
         //// CITIZEN AND ZOMBIES
-        //RandomMin = Random.Range(5, 16);
-        //MinSpawn ms = new MinSpawn(ref RandomMin);
-        //CoZ(Random.Range(ms.Min, ConstMax)); // Random Amount
-        CoZ(1);
+        RandomMin = Random.Range(5, 16);
+        MinSpawn ms = new MinSpawn(ref RandomMin);
+        CoZ(Random.Range(ms.Min, ConstMax)); // Random Amount
+        //CoZ(1);
         // END CITIZEN AND ZOMBIES
     }
 

@@ -19,12 +19,20 @@ public class HeroSpeed
 }
 #endregion
 
+[RequireComponent(typeof(Rigidbody))]
+
 public class Hero : MonoBehaviour
 {
+    public static float health;
+
     // Canvas
     Text messages;
     Image bg;
     Color bgCol = new Color(0, 0, 0, .5f);
+    CanvasGroup canvasGroup;
+    float quiteGood = Hero.health / 2;
+    float good = Hero.health / 3;
+    float bad = Hero.health / Hero.health;
     // End Canvas
 
     // Attack
@@ -33,13 +41,14 @@ public class Hero : MonoBehaviour
 
     #region Init
 
-    public void Init(GameObject body, string name, int age, Text text, Image image)
+    public void Init(GameObject body, string name, int age, Text text, Image image, CanvasGroup blood)
     {
         body.tag = "Player";
         body.name = name.ToUpper() + " " + age; // Hero Name
 
+        #region Components
+
         // RIGIDBODY
-        body.AddComponent<Rigidbody>();
         Rigidbody rb = body.GetComponent<Rigidbody>();
         rb.mass = 60f;
         rb.drag = 6f;
@@ -64,9 +73,6 @@ public class Hero : MonoBehaviour
         body.AddComponent<FPS_cam>();
         body.AddComponent<FPS_move>();
         FPS_move movement = body.GetComponent<FPS_move>();
-
-        HeroSpeed speed = new HeroSpeed(age);
-        movement.walk = speed.heroSpeed; // Age Speed
         // END SCRIPTS
 
         // GUN
@@ -77,6 +83,10 @@ public class Hero : MonoBehaviour
         gun.transform.SetParent(body.transform); // Rig
         gun.GetComponent<Renderer>().material.SetColor("_Color", Color.yellow);
         // END GUN
+        #endregion
+
+        HeroSpeed speed = new HeroSpeed(age);
+        movement.walk = speed.heroSpeed; // Age Speed
 
         // CAM
         GameObject cam = GameObject.FindGameObjectWithTag("MainCamera"); // Find Main Camera
@@ -87,6 +97,7 @@ public class Hero : MonoBehaviour
         // CANVAS
         messages = text;
         bg = image;
+        canvasGroup = blood;
         // END CANVAS
     }
     #endregion
@@ -145,5 +156,76 @@ public class Hero : MonoBehaviour
         StartCoroutine("Cleaner");
         zombieProperties.behaviour = Behaviour.getIdle;
     }
+    #endregion
+
+    #region TakeDamage
+
+    public void BeDamaged(float amount)
+    {
+        health -= amount;
+
+        if (health > quiteGood)
+        {
+            StartCoroutine(BloodTime(.2f, .5f, 1)); // Attack, Sustain, Release
+            //print("GOOD+");
+        }
+        else if (health > good && health < quiteGood)
+        {
+            StartCoroutine(BloodTime(.2f, 1.5f, 1.5f));
+            //print("GOOD");
+        }
+        else if (health > bad -1 && health < good)
+        {
+            StartCoroutine(BloodTime(.2f, 2.5f, 2));
+            //print("BAD");
+        }
+
+        if (health <= 0) Die();
+    }
+
+    void Die()
+    {
+        print("I'M DIE");
+        GameObject thisComponent = FindObjectOfType(typeof(Hero)) as GameObject;
+        Destroy(thisComponent);
+    }
+
+    // Canvas
+
+    IEnumerator HitFade(CanvasGroup cg, float a, float b, float time)
+    {
+        float tLerp = Time.time;
+        float tStarted = Time.time - tLerp;
+        float complete = tStarted / time;
+
+        while (true)
+        {
+            tStarted = Time.time - tLerp;
+            complete = tStarted / time;
+
+            float currentVal = Mathf.SmoothStep(a, b, complete);
+            if (complete >= 1) break;
+            cg.alpha = currentVal;
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    IEnumerator BloodTime(float a, float s, float r)
+    {
+        HitIn(a);
+        yield return new WaitForSeconds(r);
+        HitOut(s);
+    }
+
+    void HitIn(float inTime)
+    {
+        StartCoroutine(HitFade(canvasGroup, canvasGroup.alpha, 1, inTime));
+    }
+
+    void HitOut(float outTime)
+    {
+        StartCoroutine(HitFade(canvasGroup, canvasGroup.alpha, 0, outTime));
+    }
+    // End Canvas
     #endregion
 }

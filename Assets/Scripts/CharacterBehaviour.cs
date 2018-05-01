@@ -17,18 +17,20 @@ public class CharacterBehaviour : MonoBehaviour
     public GameObject[] allGo;
     // End Find Object
 
+    public SetBehaviour setBehaviour;
+    public ZombieProperties zombieProperties;
+    public CitizenProperties citizenProperties;
+
     // Display Gizmos
     GameObject target;
     Vector3 direction;
     Color lineColor;
     // End Display Gizmos
-
-    public SetBehaviour setBehaviour;
-    public ZombieProperties zombieProperties;
-    public CitizenProperties citizenProperties;
-    int fob; // Forward Or Backward
+    
     float partialTime;
+    bool outOfRange = true;
     bool checkCourutine;
+    float dynamicSpeed;
     public static bool zombiefied; // Check If You've Already been Bitten
 
     #region Gizmos
@@ -63,9 +65,9 @@ public class CharacterBehaviour : MonoBehaviour
     float SpeedPerAge(int age) // Use age property to set speed
     {
         float speed = 0f;
-        if (age >= 70) speed = Random.Range (2.5f, 3.6f);
-        else if (age >= 30 && age < 70) speed = Random.Range(5f, 6.1f);
-        else if (age >= 15 && age < 30) speed = 7.5f;
+        if (age >= 70) speed = Random.Range (2.5f, 5.1f);
+        else if (age >= 30 && age < 70) speed = Random.Range(5f, 7.6f);
+        else if (age >= 15 && age < 30) speed = Random.Range(7.5f, 8.1f);
         return speed;
     }
 
@@ -86,6 +88,19 @@ public class CharacterBehaviour : MonoBehaviour
                 break;
         }
     }
+
+    void Reflection()
+    {
+        if (setBehaviour.behaviour == Behaviour.goForward) setBehaviour.behaviour = Behaviour.goBackward;
+        else if (setBehaviour.behaviour == Behaviour.goBackward) setBehaviour.behaviour = Behaviour.goForward;
+
+        //transform.LookAt(new Vector3(Random.Range(-10, 11), Random.Range(-10, 11), 0));
+
+        Quaternion reflect = transform.localRotation;
+        float angleReflected = reflect.y * -1;
+        reflect.y = angleReflected;
+        transform.localRotation = reflect;
+    }
     #endregion
 
     #region Movement Core
@@ -93,11 +108,15 @@ public class CharacterBehaviour : MonoBehaviour
     IEnumerator RefreshState() // Every 3 seconds call PickState
     {
         PartialTime(out partialTime); // Start With Delay (less robotic)
-        checkCourutine = true;
-        setBehaviour.behaviour = (Behaviour)Random.Range(0, 3);
-        fob = Random.Range(0, 2); // Forward Or Backward
+
+        if (outOfRange == true) // If Distance Is Higher Than 5 Set a Behaviour, Else It's Bitting/Running
+        {
+            //checkCourutine = true;
+            setBehaviour.behaviour = (Behaviour)Random.Range(0, 4);
+        }
+
         yield return new WaitForSeconds(partialTime);
-        checkCourutine = false;
+        //checkCourutine = false;
         PartialTime(out partialTime); // Make PartialTime() a New Value Each Call
         yield return new WaitForSeconds(partialTime);
         StartCoroutine(RefreshState());
@@ -109,10 +128,13 @@ public class CharacterBehaviour : MonoBehaviour
         {
             switch (setBehaviour.behaviour)
             {
-                case Behaviour.getMove:
-                    if (fob == 0) transform.Translate(Vector3.forward * (Time.deltaTime * setBehaviour.speed), Space.Self);
-                    else if (fob == 1) transform.Translate(Vector3.back * (Time.deltaTime * setBehaviour.speed), Space.Self);
-                    //print("MOV" + fob);
+                case Behaviour.goForward:
+                    transform.Translate(Vector3.forward * (Time.deltaTime * setBehaviour.speed), Space.Self);
+                    //print("FORWARD");
+                    break;
+                case Behaviour.goBackward:
+                    transform.Translate(Vector3.back * (Time.deltaTime * setBehaviour.speed), Space.Self);
+                    //print("BAKCWARD");
                     break;
                 case Behaviour.getIdle:
                     transform.Translate(Vector3.zero);
@@ -123,7 +145,8 @@ public class CharacterBehaviour : MonoBehaviour
                     //print("ROT");
                     break;
                 case Behaviour.getReaction:
-                    print("REACT");
+                    outOfRange = false;
+                    //print("REACT");
                     break;
                 default:
                     print("Nothing");
@@ -133,58 +156,83 @@ public class CharacterBehaviour : MonoBehaviour
         else if (transform.position.x < -45) // If Get Stuck
         {
             Vector3 bounce = transform.position;
-            bounce.x = -30;
+            bounce.x = -20;
             transform.position = Vector3.Lerp(transform.position, bounce, Time.deltaTime);
+            Reflection();
         }
         else if (transform.position.x > 45) // If Get Stuck
         {
             Vector3 bounce = transform.position;
-            bounce.x = 30;
+            bounce.x = 20;
             transform.position = Vector3.Lerp(transform.position, bounce, Time.deltaTime);
+            Reflection();
         }
         else if (transform.position.z < -45) // If Get Stuck
         {
             Vector3 bounce = transform.position;
-            bounce.z = -30;
+            bounce.z = -20;
             transform.position = Vector3.Lerp(transform.position, bounce, Time.deltaTime);
+            Reflection();
         }
         else if (transform.position.z > 45) // If Get Stuck
         {
             Vector3 bounce = transform.position;
-            bounce.z = 30;
+            bounce.z = 20;
             transform.position = Vector3.Lerp(transform.position, bounce, Time.deltaTime);
+            Reflection();
         }
 
         // React
         for (int i = 0; i < Manager.allGo.Count; i++)
         {
-            if (gameObject.tag == "Zombie")
-            {
-                if (allGo[i].GetComponent<Citizen>() || allGo[i].GetComponent<Hero>()) // Zombie Attack Citizens or Hero
-                {
-                    float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
-
-                    if (dist <= 15 && dist >= .1f)
-                    {
-                        //StopCoroutine(refreshState); // Stop Case Behaviours
-                        setBehaviour.behaviour = Behaviour.getReaction;
-                        float dynamicSpeed = Mathf.Clamp(dist * 4, 30, 60); // As Much Closer, Faster
-                        transform.position = Vector3.MoveTowards(transform.position, allGo[i].transform.position, setBehaviour.speed / dynamicSpeed);
-                    }
-                }
-            }
             if (gameObject.tag == "Citizen")
             {
                 if (allGo[i].GetComponent<Zombie>()) // Citizen Run From zombie
                 {
                     float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
 
-                    if (dist <= 15 && dist >= .1f)
+                    if (dist <= 5 && dist >= .5) // Ruan Away
                     {
-                        //StopCoroutine(refreshState); // Stop Case Behaviours
                         setBehaviour.behaviour = Behaviour.getReaction;
-                        float dynamicSpeed = Mathf.Clamp(dist * 4, 30, 60); // As Much Closer, Faster
+                        dynamicSpeed = Mathf.Clamp(dist * 6, 30, 90); // As Much Closer, Faster
                         transform.position = Vector3.MoveTowards(transform.position, allGo[i].transform.position, -setBehaviour.speed / dynamicSpeed);
+                    }
+                    else
+                    {
+                        outOfRange = true;
+                    }
+                }
+                else if (allGo[i] != gameObject) // Ignore This Gameobject, And Don't Crash Each Other
+                {
+                    float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
+                    
+                    if (dist <= 2.5f && dist >= .5f)
+                    {
+                        setBehaviour.behaviour = Behaviour.getReaction;
+                        dynamicSpeed = Mathf.Clamp(dist * 6, 30, 90); // As Much Closer, Faster
+                        transform.position = Vector3.MoveTowards(transform.position, allGo[i].transform.position, -setBehaviour.speed / dynamicSpeed);
+                    }
+                    else
+                    {
+                        outOfRange = true;
+                    }
+                }
+            }
+            if (gameObject.tag == "Zombie")
+            {
+                if (allGo[i].GetComponent<Citizen>() || allGo[i].GetComponent<Hero>()) // Zombie Attack Citizens
+                {
+                    float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
+
+                    if (dist <= 15 && dist >= .5f)
+                    {
+                        setBehaviour.behaviour = Behaviour.getReaction;
+                        dynamicSpeed = Mathf.Clamp(dist * 6, 30, 90); // As Much Closer, Faster
+                        transform.position = Vector3.MoveTowards(transform.position, allGo[i].transform.position, setBehaviour.speed / dynamicSpeed);
+                    }
+                    else
+                    {
+                        outOfRange = true;
                     }
                 }
             }
@@ -213,11 +261,11 @@ public class CharacterBehaviour : MonoBehaviour
     void FixedUpdate()
     {
         //print("Courutine: " + checkCourutine);
+
         Vector3 dontFly = gameObject.transform.position;
         dontFly.y = Mathf.Clamp(dontFly.y, -Mathf.Infinity, 1.5f);
         gameObject.transform.position = dontFly;
         
         MoveIt(); // Move
-        //React();
     }
 }
