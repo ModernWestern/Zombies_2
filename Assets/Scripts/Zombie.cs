@@ -51,40 +51,17 @@ namespace NPC
 
             void AudioClip(float distance)
             {
-                if (distance > 10 && distance < 15 && oneShot == false)
+                if (distance > 10 && distance < 15)
                 {
-                    AudioManager.oncePlay = true;
                     audioManagerZombie.SetClip(SFX.DistantRoar);
-                    
-                    if (AudioManager.oncePlay == true)
-                    {
-                        oneShot = true;
-                    }
                 }
-                if (distance > 5 && distance < 10 && oneShot == true)
+                if (distance > 5 && distance < 10)
                 {
-                    AudioManager.oncePlay = true;
                     audioManagerZombie.SetClip(SFX.MidRoar);
-
-                    if (AudioManager.oncePlay == true)
-                    {
-                        oneShot = false;
-                    }
                 }
-                if (distance > 0 && distance < 5 && oneShot == false)
+                if (distance > 0 && distance < 5)
                 {
-                    AudioManager.oncePlay = true;
                     audioManagerZombie.SetClip(SFX.CloseRoar);
-
-                    if (AudioManager.oncePlay == true)
-                    {
-                        oneShot = true;
-                    }
-                }
-                if (distance > 15 && oneShot == true)
-                {
-                    AudioManager.oncePlay = false;
-                    oneShot = false;
                 }
             }
             #endregion
@@ -168,7 +145,7 @@ namespace NPC
                 DisplayDrawLine(goCitizens[index], ZombieColor()); // Gizmos
                 // End Gizmos
 
-                AudioClip(dist); // Use dist From CharacterBehaviour Class
+                AudioClip(heroDistance); // Use dist From CharacterBehaviour Class
             }
             #endregion
         }

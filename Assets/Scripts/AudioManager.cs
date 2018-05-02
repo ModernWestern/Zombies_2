@@ -4,8 +4,8 @@
 
 public class AudioManager : MonoBehaviour
 {
+    Manager manager;
     AudioSource audioSource;
-    public static bool oncePlay;
 
     float lowPitch = .95f;
     float highPitch = 1.05f;
@@ -15,7 +15,7 @@ public class AudioManager : MonoBehaviour
         switch(sfx)
         {
             case (SFX.DistantRoar):
-                if (oncePlay == true)
+                if (!audioSource.isPlaying)
                 {
                     audioSource.pitch = Random.Range(lowPitch, highPitch);
                     audioSource.PlayOneShot(RandomClip(SFX.DistantRoar));
@@ -23,7 +23,7 @@ public class AudioManager : MonoBehaviour
                 }
                 break;
             case (SFX.MidRoar):
-                if (oncePlay == true)
+                if (!audioSource.isPlaying)
                 {
                     audioSource.pitch = Random.Range(lowPitch, highPitch);
                     audioSource.PlayOneShot(RandomClip(SFX.MidRoar));
@@ -31,7 +31,7 @@ public class AudioManager : MonoBehaviour
                 }
                 break;
             case (SFX.CloseRoar):
-                if (oncePlay == true)
+                if (!audioSource.isPlaying)
                 {
                     audioSource.pitch = Random.Range(lowPitch, highPitch);
                     audioSource.PlayOneShot(RandomClip(SFX.CloseRoar));
@@ -48,9 +48,9 @@ public class AudioManager : MonoBehaviour
     {
         AudioClip randomClip = null;
 
-        if (sfx == SFX.CloseRoar) randomClip = Manager.close[Random.Range(0, Manager.close.Length - 1)];
-        if (sfx == SFX.MidRoar) randomClip = Manager.mid[Random.Range(0, Manager.mid.Length - 1)];
-        if (sfx == SFX.DistantRoar) randomClip = Manager.distant[Random.Range(0, Manager.distant.Length - 1)];
+        if (sfx == SFX.CloseRoar) randomClip = manager.zombieAudioSettings.close[Random.Range(0, manager.zombieAudioSettings.close.Length - 1)];
+        if (sfx == SFX.MidRoar) randomClip = manager.zombieAudioSettings.mid[Random.Range(0, manager.zombieAudioSettings.mid.Length - 1)];
+        if (sfx == SFX.DistantRoar) randomClip = manager.zombieAudioSettings.distant[Random.Range(0, manager.zombieAudioSettings.distant.Length - 1)];
 
         return randomClip;
     }
@@ -58,12 +58,6 @@ public class AudioManager : MonoBehaviour
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
-    }
-
-    void Start()
-    {
-        //print("BOX CLOSE: " + Manager.close.Length);
-        //print("BOX MID: " + Manager.mid.Length);
-        //print("BOX DISTANT: " + Manager.distant.Length);
+        manager = FindObjectOfType<Manager>();
     }
 }

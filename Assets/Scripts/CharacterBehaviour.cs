@@ -26,13 +26,13 @@ public class CharacterBehaviour : MonoBehaviour
     Vector3 direction;
     Color lineColor;
     // End Display Gizmos
-
-    public float dist; // Public To Set SFX Clips
+    
     float partialTime;
     bool outOfRange = true;
     bool checkCourutine;
     float dynamicSpeed;
     public static bool zombiefied; // Check If You've Already been Bitten
+    public float heroDistance; // Distance Value Between Hero And Zombies (AudioSource Parameter)
 
     #region Gizmos
 
@@ -188,7 +188,7 @@ public class CharacterBehaviour : MonoBehaviour
             {
                 if (allGo[i].GetComponent<Zombie>()) // Citizen Run From zombie
                 {
-                    dist = Vector3.Distance(allGo[i].transform.position, transform.position);
+                    float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
 
                     if (dist <= 5 && dist >= .5) // Ruan Away
                     {
@@ -203,7 +203,7 @@ public class CharacterBehaviour : MonoBehaviour
                 }
                 else if (allGo[i] != gameObject) // Ignore This Gameobject, And Don't Crash Each Other
                 {
-                    dist = Vector3.Distance(allGo[i].transform.position, transform.position);
+                    float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
                     
                     if (dist <= 2.5f && dist >= .5f)
                     {
@@ -219,9 +219,26 @@ public class CharacterBehaviour : MonoBehaviour
             }
             if (gameObject.tag == "Zombie")
             {
-                if (allGo[i].GetComponent<Citizen>() || allGo[i].GetComponent<Hero>()) // Zombie Attack Citizens
+                if (allGo[i].GetComponent<Citizen>()) // Zombie Attack Citizens
                 {
-                    dist = Vector3.Distance(allGo[i].transform.position, transform.position);
+                    float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
+
+                    if (dist <= 15 && dist >= .5f)
+                    {
+                        setBehaviour.behaviour = Behaviour.getReaction;
+                        dynamicSpeed = Mathf.Clamp(dist * 6, 30, 90); // As Much Closer, Faster
+                        transform.position = Vector3.MoveTowards(transform.position, allGo[i].transform.position, setBehaviour.speed / dynamicSpeed);
+                    }
+                    else
+                    {
+                        outOfRange = true;
+                    }
+                }
+                if (allGo[i].GetComponent<Hero>()) // Zombie Attack Citizens
+                {
+                    float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
+
+                    heroDistance = dist; // To Audio Parameter
 
                     if (dist <= 15 && dist >= .5f)
                     {

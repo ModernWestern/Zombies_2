@@ -68,9 +68,14 @@ public class Hero : MonoBehaviour
         cc.radius = .5f;
         cc.height = 2f;
         cc.direction = 1; // 0 = x, 1 = y, 2 = z
-        // END COLLIDER 
+                          // END COLLIDER 
 
         // SCRIPTS
+        body.AddComponent<AudioManager>(); // Set AudioManager Class
+        AudioSource heroAS = GetComponent<AudioSource>(); // Get AudioSource Componente Created By AudioManager Class
+        heroAS.playOnAwake = false; // Set AudioSource PlayOnAwake Parameter
+        heroAS.volume = .05f;
+
         body.AddComponent<CustomGravity>();
         CustomGravity cg = body.GetComponent<CustomGravity>();
         cg.gravityScale = 15;
@@ -78,11 +83,6 @@ public class Hero : MonoBehaviour
         body.AddComponent<FPS_cam>();
         body.AddComponent<FPS_move>();
         FPS_move movement = body.GetComponent<FPS_move>();
-
-        body.AddComponent<AudioManager>(); // Set AudioManager Class
-        AudioSource heroAS = GetComponent<AudioSource>(); // Get AudioSource Componente Created By AudioManager Class
-        heroAS.playOnAwake = false; // Set AudioSource PlayOnAwake Parameter
-        heroAS.volume = .05f;
         // END SCRIPTS
 
         // GUN

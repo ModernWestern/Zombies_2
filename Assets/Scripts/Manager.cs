@@ -51,9 +51,6 @@ public class Manager : MonoBehaviour
 
     // Audio
     public ZombieAudioSettings zombieAudioSettings;
-    public static AudioClip[] close;
-    public static AudioClip[] mid;
-    public static AudioClip[] distant;
     // End Audio
 
     // Spawn
@@ -161,10 +158,9 @@ public class Manager : MonoBehaviour
         // END HERO
 
         // CITIZEN AND ZOMBIES
-        //RandomMin = Random.Range(5, 16);
-        //MinSpawn ms = new MinSpawn(ref RandomMin);
-        //CoZ(Random.Range(ms.Min, ConstMax)); // Random Amount
-        CoZ(10);
+        RandomMin = Random.Range(5, 16);
+        MinSpawn ms = new MinSpawn(ref RandomMin);
+        CoZ(Random.Range(ms.Min, ConstMax)); // Random Amount
         // END CITIZEN AND ZOMBIES
     }
 
@@ -175,13 +171,6 @@ public class Manager : MonoBehaviour
         // CANVAS
         DisplayQuantity();
         // END CANVAS
-    }
-
-    private void Start()
-    {
-        close = zombieAudioSettings.close;
-        mid = zombieAudioSettings.mid;
-        distant = zombieAudioSettings.distant;
     }
     #endregion
 }
