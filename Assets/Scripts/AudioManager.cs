@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
-[RequireComponent(typeof(AudioReverbZone))]
 
 public class AudioManager : MonoBehaviour
 {
