@@ -56,7 +56,7 @@ namespace NPC
                 gameObject.tag = "Citizen";
                 SphereCollider sc = gameObject.GetComponent<SphereCollider>();
                 sc.isTrigger = true;
-                sc.radius = 1f;
+                sc.radius = 2f;
                 // End Collison Message
                 
                 base.Start(); // Start Start() from CharacterBehaviour.cs

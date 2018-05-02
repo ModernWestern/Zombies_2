@@ -26,7 +26,8 @@ public class CharacterBehaviour : MonoBehaviour
     Vector3 direction;
     Color lineColor;
     // End Display Gizmos
-    
+
+    public float dist; // Public To Set SFX Clips
     float partialTime;
     bool outOfRange = true;
     bool checkCourutine;
@@ -93,8 +94,6 @@ public class CharacterBehaviour : MonoBehaviour
     {
         if (setBehaviour.behaviour == Behaviour.goForward) setBehaviour.behaviour = Behaviour.goBackward;
         else if (setBehaviour.behaviour == Behaviour.goBackward) setBehaviour.behaviour = Behaviour.goForward;
-
-        //transform.LookAt(new Vector3(Random.Range(-10, 11), Random.Range(-10, 11), 0));
 
         Quaternion reflect = transform.localRotation;
         float angleReflected = reflect.y * -1;
@@ -189,7 +188,7 @@ public class CharacterBehaviour : MonoBehaviour
             {
                 if (allGo[i].GetComponent<Zombie>()) // Citizen Run From zombie
                 {
-                    float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
+                    dist = Vector3.Distance(allGo[i].transform.position, transform.position);
 
                     if (dist <= 5 && dist >= .5) // Ruan Away
                     {
@@ -204,7 +203,7 @@ public class CharacterBehaviour : MonoBehaviour
                 }
                 else if (allGo[i] != gameObject) // Ignore This Gameobject, And Don't Crash Each Other
                 {
-                    float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
+                    dist = Vector3.Distance(allGo[i].transform.position, transform.position);
                     
                     if (dist <= 2.5f && dist >= .5f)
                     {
@@ -222,7 +221,7 @@ public class CharacterBehaviour : MonoBehaviour
             {
                 if (allGo[i].GetComponent<Citizen>() || allGo[i].GetComponent<Hero>()) // Zombie Attack Citizens
                 {
-                    float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
+                    dist = Vector3.Distance(allGo[i].transform.position, transform.position);
 
                     if (dist <= 15 && dist >= .5f)
                     {

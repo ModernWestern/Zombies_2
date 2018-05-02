@@ -29,11 +29,16 @@ public class Hero : MonoBehaviour
     Text messages;
     Image bg;
     Color bgCol = new Color(0, 0, 0, .5f);
-    CanvasGroup canvasGroup;
-    float quiteGood = Hero.health / 2;
-    float good = Hero.health / 3;
-    float bad = Hero.health / Hero.health;
+    CanvasGroup[] canvasGroup;
+    Image youDie;
     // End Canvas
+
+    // Health
+    int canvasGroupLenght;
+    float quiteGood = health / 2;
+    float good = health / 3;
+    float bad = health / health;
+    // End Health
 
     // Attack
     ZombieProperties zombieProperties;
@@ -41,7 +46,7 @@ public class Hero : MonoBehaviour
 
     #region Init
 
-    public void Init(GameObject body, string name, int age, Text text, Image image, CanvasGroup blood)
+    public void Init(GameObject body, string name, int age, Text text, Image image, CanvasGroup[] canvasGroups, int lenght, Image die)
     {
         body.tag = "Player";
         body.name = name.ToUpper() + " " + age; // Hero Name
@@ -73,6 +78,11 @@ public class Hero : MonoBehaviour
         body.AddComponent<FPS_cam>();
         body.AddComponent<FPS_move>();
         FPS_move movement = body.GetComponent<FPS_move>();
+
+        body.AddComponent<AudioManager>(); // Set AudioManager Class
+        AudioSource heroAS = GetComponent<AudioSource>(); // Get AudioSource Componente Created By AudioManager Class
+        heroAS.playOnAwake = false; // Set AudioSource PlayOnAwake Parameter
+        heroAS.volume = .05f;
         // END SCRIPTS
 
         // GUN
@@ -97,7 +107,9 @@ public class Hero : MonoBehaviour
         // CANVAS
         messages = text;
         bg = image;
-        canvasGroup = blood;
+        canvasGroup = canvasGroups;
+        canvasGroupLenght = lenght;
+        youDie = die;
         // END CANVAS
     }
     #endregion
@@ -185,9 +197,17 @@ public class Hero : MonoBehaviour
 
     void Die()
     {
-        print("I'M DIE");
-        GameObject thisComponent = FindObjectOfType(typeof(Hero)) as GameObject;
-        Destroy(thisComponent);
+        youDie.enabled = true;
+        Destroy(gameObject.GetComponent<Hero>()); // Stop Chasing Me
+        Destroy(gameObject.GetComponent<FPS_move>()); // Don't Move
+
+        for (int i = 0; i < canvasGroupLenght; i++) // Active All Feedbacks
+        {
+            canvasGroup[i].alpha = 1;
+        }
+
+        messages.text = " "; // Clean Texts
+        bg.color = new Color(0, 0, 0, 0); // Clean Background
     }
 
     // Canvas
@@ -219,12 +239,18 @@ public class Hero : MonoBehaviour
 
     void HitIn(float inTime)
     {
-        StartCoroutine(HitFade(canvasGroup, canvasGroup.alpha, 1, inTime));
+        for (int i = 0; i < canvasGroupLenght; i++)
+        {
+            StartCoroutine(HitFade(canvasGroup[i], canvasGroup[i].alpha, 1, inTime));
+        }
     }
 
     void HitOut(float outTime)
     {
-        StartCoroutine(HitFade(canvasGroup, canvasGroup.alpha, 0, outTime));
+        for (int i = 0; i < canvasGroupLenght; i++)
+        {
+            StartCoroutine(HitFade(canvasGroup[i], canvasGroup[i].alpha, 0, outTime));
+        }
     }
     // End Canvas
     #endregion

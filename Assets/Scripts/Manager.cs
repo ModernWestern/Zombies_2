@@ -17,9 +17,16 @@ public class MinSpawn
 }
 #endregion
 
+[System.Serializable]
+public class ZombieAudioSettings
+{
+    public AudioClip[] distant;
+    public AudioClip[] mid;
+    public AudioClip[] close;
+}
+
 public class Manager : MonoBehaviour
 {
-    public bool inhertiTest;
     public string namesFile; // Public Field To Type File Name
     public bool cursorLock = false;
     public static List<GameObject> allGo = new List<GameObject>(); // Store Game Objects
@@ -36,11 +43,18 @@ public class Manager : MonoBehaviour
     // End Scene Characters
 
     // Canvas
-    public Text[] text;
+    public Text[] texts;
     public Image[] images;
-    public CanvasGroup blood;
+    public CanvasGroup[] canvasGroups;
     Color onlyAlpha;
     // End Canvas
+
+    // Audio
+    public ZombieAudioSettings zombieAudioSettings;
+    public static AudioClip[] close;
+    public static AudioClip[] mid;
+    public static AudioClip[] distant;
+    // End Audio
 
     // Spawn
     int RandomMin;
@@ -58,8 +72,8 @@ public class Manager : MonoBehaviour
             if (gameObjecs.tag == "Zombie") zombieQ++;
             else if (gameObjecs.tag == "Citizen") citizenQ++;
         }
-        text[0].text = zombieQ.ToString(); // Canvas
-        text[1].text = citizenQ.ToString(); // Canvas
+        texts[0].text = zombieQ.ToString(); // Canvas
+        texts[1].text = citizenQ.ToString(); // Canvas
     }
     #endregion
     
@@ -139,18 +153,18 @@ public class Manager : MonoBehaviour
         Scene();
 
         // HERO
-        Hero.health = 20; // Set Health
+        Hero.health = 20; // Set Health (Static From Hero Class)
         hero = GameObject.CreatePrimitive(PrimitiveType.Capsule); // Create an Object
-        hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge(), text[2], images[0], blood);
+        hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge(), texts[2], images[0], canvasGroups, 2, images[2]);
         hero.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Random Position
         allGo.Add(hero);
         // END HERO
 
-        //// CITIZEN AND ZOMBIES
-        RandomMin = Random.Range(5, 16);
-        MinSpawn ms = new MinSpawn(ref RandomMin);
-        CoZ(Random.Range(ms.Min, ConstMax)); // Random Amount
-        //CoZ(1);
+        // CITIZEN AND ZOMBIES
+        //RandomMin = Random.Range(5, 16);
+        //MinSpawn ms = new MinSpawn(ref RandomMin);
+        //CoZ(Random.Range(ms.Min, ConstMax)); // Random Amount
+        CoZ(10);
         // END CITIZEN AND ZOMBIES
     }
 
@@ -161,6 +175,13 @@ public class Manager : MonoBehaviour
         // CANVAS
         DisplayQuantity();
         // END CANVAS
+    }
+
+    private void Start()
+    {
+        close = zombieAudioSettings.close;
+        mid = zombieAudioSettings.mid;
+        distant = zombieAudioSettings.distant;
     }
     #endregion
 }
