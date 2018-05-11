@@ -47,8 +47,6 @@ namespace NPC
 
             #region Audio
 
-            bool oneShot;
-
             void AudioClip(float distance)
             {
                 if (distance > 10 && distance < 15)
@@ -145,7 +143,7 @@ namespace NPC
                 DisplayDrawLine(goCitizens[index], ZombieColor()); // Gizmos
                 // End Gizmos
 
-                AudioClip(heroDistance); // Use dist From CharacterBehaviour Class
+                AudioClip(CharacterBehaviour.heroToZombie); // Use dist From CharacterBehaviour Class
             }
             #endregion
         }

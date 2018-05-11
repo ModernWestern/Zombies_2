@@ -28,7 +28,7 @@ namespace NPC
 
             string Message(string _name, int _age) // Greetings Generator
             {
-                int index = Random.Range(0, (int)Greeting.Lenght);
+                int index = Random.Range(0, (int)Greeting.DUMMY_ELEMENT);
                 citizenProperties.greeting = (Greeting)index;
                 string message = citizenProperties.greeting.ToString() + "! I'm " + _name + "and I'm " + _age + "yo"; // CANVAS
                 return message;

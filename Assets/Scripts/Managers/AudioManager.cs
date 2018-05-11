@@ -57,7 +57,7 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         manager = FindObjectOfType<Manager>();
+        audioSource = GetComponent<AudioSource>();
     }
 }

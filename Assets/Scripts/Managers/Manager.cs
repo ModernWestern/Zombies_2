@@ -1,7 +1,6 @@
 ﻿
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using NPC.Ally;
 using NPC.Enemy;
 
@@ -27,7 +26,6 @@ public class ZombieAudioSettings
 
 public class Manager : MonoBehaviour
 {
-    public string namesFile; // Public Field To Type File Name
     public bool cursorLock = false;
     public static List<GameObject> allGo = new List<GameObject>(); // Store Game Objects
 
@@ -42,11 +40,11 @@ public class Manager : MonoBehaviour
     GameObject cObject;
     // End Scene Characters
 
+    [Range(20,50)]
+    public int heroHealth;
+
     // Canvas
-    public Text[] texts;
-    public Image[] images;
-    public CanvasGroup[] canvasGroups;
-    Color onlyAlpha;
+    ManagerUI managerUI;
     // End Canvas
 
     // Audio
@@ -69,8 +67,8 @@ public class Manager : MonoBehaviour
             if (gameObjecs.tag == "Zombie") zombieQ++;
             else if (gameObjecs.tag == "Citizen") citizenQ++;
         }
-        texts[0].text = zombieQ.ToString(); // Canvas
-        texts[1].text = citizenQ.ToString(); // Canvas
+        managerUI.texts[0].text = zombieQ.ToString(); // Canvas
+        managerUI.texts[1].text = citizenQ.ToString(); // Canvas
     }
     #endregion
     
@@ -88,11 +86,13 @@ public class Manager : MonoBehaviour
 
     string CharacterNames() // Name Generator
     {
-        string[] characterNames; // Store Names
-        var txt = Resources.Load(namesFile, typeof(TextAsset)) as TextAsset; // Names File
-        characterNames = txt.text.Split('\n'); // Load Names And Split By Spaces
-        int selectedName = Random.Range(0, characterNames.Length); // Select a Name From Names File
-        return characterNames[selectedName]; // Return a Name
+        FirstName firstName;
+        LastName lastName;
+        string fullName = " ";
+        firstName = (FirstName)Random.Range(0, (int)FirstName.DUMMY_ELEMENT);
+        lastName = (LastName)Random.Range(0, (int)LastName.DUMMY_ELEMENT);
+        fullName = firstName.ToString() + " " + lastName.ToString();
+        return fullName;
     }
 
     int CharacterAge() // Age Generator
@@ -149,10 +149,14 @@ public class Manager : MonoBehaviour
 
         Scene();
 
+
+        managerUI = FindObjectOfType<ManagerUI>(); // Call Class
+
         // HERO
-        Hero.health = 20; // Set Health (Static From Hero Class)
+        Hero.health = heroHealth; // Set Health (Static From Hero Class)
+        managerUI.sliders[0].maxValue = heroHealth; // Set Max Health
         hero = GameObject.CreatePrimitive(PrimitiveType.Capsule); // Create an Object
-        hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge(), texts[2], images[0], canvasGroups, 2, images[2]);
+        hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge());
         hero.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Random Position
         allGo.Add(hero);
         // END HERO
@@ -161,6 +165,7 @@ public class Manager : MonoBehaviour
         RandomMin = Random.Range(5, 16);
         MinSpawn ms = new MinSpawn(ref RandomMin);
         CoZ(Random.Range(ms.Min, ConstMax)); // Random Amount
+        //CoZ(10); // TEST
         // END CITIZEN AND ZOMBIES
     }
 

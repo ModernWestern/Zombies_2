@@ -32,7 +32,7 @@ public class CharacterBehaviour : MonoBehaviour
     bool checkCourutine;
     float dynamicSpeed;
     public static bool zombiefied; // Check If You've Already been Bitten
-    public float heroDistance; // Distance Value Between Hero And Zombies (AudioSource Parameter)
+    public static float heroToZombie;
 
     #region Gizmos
 
@@ -234,11 +234,10 @@ public class CharacterBehaviour : MonoBehaviour
                         outOfRange = true;
                     }
                 }
-                if (allGo[i].GetComponent<Hero>()) // Zombie Attack Citizens
+                else if (allGo[i].GetComponent<Hero>()) // Zombie Attack Hero
                 {
                     float dist = Vector3.Distance(allGo[i].transform.position, transform.position);
-
-                    heroDistance = dist; // To Audio Parameter
+                    heroToZombie = dist; // Check Dist To Play a Clip*
 
                     if (dist <= 15 && dist >= .5f)
                     {
