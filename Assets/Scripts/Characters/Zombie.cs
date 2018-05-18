@@ -13,7 +13,7 @@ namespace NPC
             GameObject[] goCitizens;
 
             // Audio
-            AudioManager audioManagerZombie;
+            AudioSystem audioManagerZombie;
             // End Audio
 
             #region Init
@@ -115,7 +115,7 @@ namespace NPC
 
                 // Audio
                 GameObject heroAs = GameObject.FindGameObjectWithTag("Player") as GameObject;
-                audioManagerZombie = heroAs.GetComponent<AudioManager>() as AudioManager;
+                audioManagerZombie = heroAs.GetComponent<AudioSystem>() as AudioSystem;
                 // End Audio
 
                 base.Start(); // Start Start() from CharacterBehaviour.cs

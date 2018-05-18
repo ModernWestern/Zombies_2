@@ -16,14 +16,6 @@ public class MinSpawn
 }
 #endregion
 
-[System.Serializable]
-public class ZombieAudioSettings
-{
-    public AudioClip[] distant;
-    public AudioClip[] mid;
-    public AudioClip[] close;
-}
-
 public class Manager : MonoBehaviour
 {
     public bool cursorLock = false;
@@ -44,12 +36,8 @@ public class Manager : MonoBehaviour
     public int heroHealth;
 
     // Canvas
-    ManagerUI managerUI;
+    UIManager UImanager;
     // End Canvas
-
-    // Audio
-    public ZombieAudioSettings zombieAudioSettings;
-    // End Audio
 
     // Spawn
     int RandomMin;
@@ -67,8 +55,8 @@ public class Manager : MonoBehaviour
             if (gameObjecs.tag == "Zombie") zombieQ++;
             else if (gameObjecs.tag == "Citizen") citizenQ++;
         }
-        managerUI.texts[0].text = zombieQ.ToString(); // Canvas
-        managerUI.texts[1].text = citizenQ.ToString(); // Canvas
+        UImanager.texts[0].text = zombieQ.ToString(); // Canvas
+        UImanager.texts[1].text = citizenQ.ToString(); // Canvas
     }
     #endregion
     
@@ -150,11 +138,11 @@ public class Manager : MonoBehaviour
         Scene();
 
 
-        managerUI = FindObjectOfType<ManagerUI>(); // Call Class
+        UImanager = FindObjectOfType<UIManager>(); // Call Class
 
         // HERO
         Hero.health = heroHealth; // Set Health (Static From Hero Class)
-        managerUI.sliders[0].maxValue = heroHealth; // Set Max Health
+        UImanager.sliders[0].maxValue = heroHealth; // Set Max Health
         hero = GameObject.CreatePrimitive(PrimitiveType.Capsule); // Create an Object
         hero.AddComponent<Hero>().Init(hero, CharacterNames(), CharacterAge());
         hero.transform.position = new Vector3(Random.Range(-40, 40), .5f, Random.Range(-40, 40)); // Random Position

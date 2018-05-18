@@ -25,14 +25,15 @@ public class Hero : MonoBehaviour
     public static float health;
 
     // Canvas
-    ManagerUI managerUI;
+    UIManager UImanager;
     Color bgCol = new Color(0, 0, 0, .5f);
+
     // End Canvas
 
     // Health
-    float quiteGood = health / 2;
-    float good = health / 3;
-    float bad = health / health;
+    readonly float quiteGood = health / 2;
+    readonly float good = health / 3;
+    readonly float bad = health / health;
     // End Health
 
     // Attack
@@ -74,7 +75,7 @@ public class Hero : MonoBehaviour
         body.AddComponent<FPS_move>();
         FPS_move movement = body.GetComponent<FPS_move>();
 
-        body.AddComponent<AudioManager>(); // Set AudioManager Class
+        body.AddComponent<AudioSystem>(); // Set AudioManager Class
         AudioSource heroAS = GetComponent<AudioSource>(); // Get AudioSource Componente Created By AudioManager Class
         heroAS.playOnAwake = false; // Set AudioSource PlayOnAwake Parameter
         heroAS.volume = .05f;
@@ -99,7 +100,7 @@ public class Hero : MonoBehaviour
         cam.transform.SetParent(body.transform);
         // END CAM
 
-        managerUI = FindObjectOfType<ManagerUI>(); // Call Class
+        UImanager = FindObjectOfType<UIManager>(); // Call Class
     }
     #endregion
 
@@ -111,7 +112,7 @@ public class Hero : MonoBehaviour
         if (coll.CompareTag("Zombie"))
         {
             Zombie zombie = coll.GetComponent<Zombie>(); // Call (Get) Zombie Class
-            managerUI.images[0].color = bgCol; // Text Color in Regards With Zombie Color
+            UImanager.images[0].color = bgCol; // Text Color in Regards With Zombie Color
 
             if (zombie.zombieProperties.bodyPart == " ") // If Zombie bodyPart is "null" Allocate a Taste
             {
@@ -119,15 +120,15 @@ public class Hero : MonoBehaviour
                 zombie.zombieProperties.taste = (Taste)index;
                 zombie.zombieProperties.bodyPart = zombie.zombieProperties.taste.ToString();
                 
-                managerUI.texts[2].text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
-                managerUI.texts[2].color = zombie.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
+                UImanager.texts[2].text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
+                UImanager.texts[2].color = zombie.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
 
                 zombieProperties.behaviour = Behaviour.getReaction;
             }
             else // If Zombie bodyPart is !null Just Print
             {
-                managerUI.texts[2].text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
-                managerUI.texts[2].color = zombie.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
+                UImanager.texts[2].text = "Roarrr, I'm starving, yummy... " + zombie.zombieProperties.bodyPart;
+                UImanager.texts[2].color = zombie.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
                 zombieProperties.behaviour = Behaviour.getReaction;
             }
         }
@@ -136,10 +137,10 @@ public class Hero : MonoBehaviour
         // Citizen Info
         else if (coll.CompareTag("Citizen"))
         {
-            managerUI.images[0].color = bgCol;
+            UImanager.images[0].color = bgCol;
             Citizen citizen = coll.GetComponent<Citizen>();
-            managerUI.texts[2].color = citizen.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
-            managerUI.texts[2].text = citizen.citizenProperties.info;
+            UImanager.texts[2].color = citizen.GetComponent<Renderer>().material.color; // Text Color in Regards With Zombie Color
+            UImanager.texts[2].text = citizen.citizenProperties.info;
         }
         // End Citizen Info
     }
@@ -147,8 +148,8 @@ public class Hero : MonoBehaviour
     IEnumerator Cleaner() // Clena Messages and Background Field
     {
         yield return new WaitForSeconds(1);
-        managerUI.texts[2].text = " ";
-        managerUI.images[0].color = new Color(0, 0, 0, 0);
+        UImanager.texts[2].text = " ";
+        UImanager.images[0].color = new Color(0, 0, 0, 0);
         StopCoroutine("Cleaner");
     }
 
@@ -181,24 +182,24 @@ public class Hero : MonoBehaviour
             //print("BAD");
         }
 
-        managerUI.sliders[0].value = health; // Update Health Bar
+        UImanager.sliders[0].value = health; // Update Health Bar
 
         if (health <= 0) Die();
     }
 
     void Die()
     {
-        managerUI.images[1].enabled = true;
+        UImanager.images[1].enabled = true;
         Destroy(gameObject.GetComponent<Hero>()); // Stop Chasing Me
         Destroy(gameObject.GetComponent<FPS_move>()); // Don't Move
 
-        for (int i = 0; i < managerUI.canvasGroups.Length; i++) // Active All Feedbacks
+        for (int i = 0; i < UImanager.canvasGroups.Length; i++) // Active All Feedbacks
         {
-            managerUI.canvasGroups[i].alpha = 1;
+            UImanager.canvasGroups[i].alpha = 1;
         }
 
-        managerUI.texts[2].text = " "; // Clean Texts
-        managerUI.images[0].color = new Color(0, 0, 0, 0); // Clean Background
+        UImanager.texts[2].text = " "; // Clean Texts
+        UImanager.images[0].color = new Color(0, 0, 0, 0); // Clean Background
     }
 
     // Canvas
@@ -230,17 +231,17 @@ public class Hero : MonoBehaviour
 
     void HitIn(float inTime)
     {
-        for (int i = 0; i < managerUI.canvasGroups.Length; i++)
+        for (int i = 0; i < UImanager.canvasGroups.Length; i++)
         {
-            StartCoroutine(HitFade(managerUI.canvasGroups[i], managerUI.canvasGroups[i].alpha, 1, inTime));
+            StartCoroutine(HitFade(UImanager.canvasGroups[i], UImanager.canvasGroups[i].alpha, 1, inTime));
         }
     }
 
     void HitOut(float outTime)
     {
-        for (int i = 0; i < managerUI.canvasGroups.Length; i++)
+        for (int i = 0; i < UImanager.canvasGroups.Length; i++)
         {
-            StartCoroutine(HitFade(managerUI.canvasGroups[i], managerUI.canvasGroups[i].alpha, 0, outTime));
+            StartCoroutine(HitFade(UImanager.canvasGroups[i], UImanager.canvasGroups[i].alpha, 0, outTime));
         }
     }
     // End Canvas

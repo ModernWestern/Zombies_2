@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 
 [System.Serializable]
-public class ManagerUI : MonoBehaviour
+public class UIManager : MonoBehaviour
 {
     public Text[] texts;
     public Image[] images;

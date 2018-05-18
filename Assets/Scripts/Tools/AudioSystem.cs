@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
-
-public class AudioManager : MonoBehaviour
+public class AudioSystem : MonoBehaviour
 {
-    Manager manager;
+    AudioManager manager;
     AudioSource audioSource;
-
-    float lowPitch = .95f;
-    float highPitch = 1.05f;
+    readonly float lowPitch = .95f;
+    readonly float highPitch = 1.05f;
 
     public void SetClip(SFX sfx)
     {
@@ -48,16 +46,16 @@ public class AudioManager : MonoBehaviour
     {
         AudioClip randomClip = null;
 
-        if (sfx == SFX.CloseRoar) randomClip = manager.zombieAudioSettings.close[Random.Range(0, manager.zombieAudioSettings.close.Length - 1)];
-        if (sfx == SFX.MidRoar) randomClip = manager.zombieAudioSettings.mid[Random.Range(0, manager.zombieAudioSettings.mid.Length - 1)];
-        if (sfx == SFX.DistantRoar) randomClip = manager.zombieAudioSettings.distant[Random.Range(0, manager.zombieAudioSettings.distant.Length - 1)];
+        if (sfx == SFX.CloseRoar) randomClip = manager.zombieClips.close[Random.Range(0, manager.zombieClips.close.Length - 1)];
+        if (sfx == SFX.MidRoar) randomClip = manager.zombieClips.mid[Random.Range(0, manager.zombieClips.mid.Length - 1)];
+        if (sfx == SFX.DistantRoar) randomClip = manager.zombieClips.distant[Random.Range(0, manager.zombieClips.distant.Length - 1)];
 
         return randomClip;
     }
 
     private void Awake()
     {
-        manager = FindObjectOfType<Manager>();
+        manager = FindObjectOfType<AudioManager>();
         audioSource = GetComponent<AudioSource>();
     }
 }
